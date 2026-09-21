@@ -1,0 +1,24 @@
+{
+  "name": "bookme",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "dev:api": "pnpm --filter '@bookme/api' dev",
+    "dev:web": "pnpm --filter '@bookme/web' dev",
+    "dev": "pnpm --parallel --filter ./apps/* dev",
+    "build": "pnpm --recursive run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.5.1",
+      "onFail": "download"
+    }
+  },
+  "packageManager": "pnpm@12.5.1",
+  "type": "module"
+}
