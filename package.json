@@ -4,8 +4,8 @@
   "description": "",
   "private": true,
   "scripts": {
-    "dev:api": "pnpm --filter '@bookme/api' dev",
-    "dev:web": "pnpm --filter '@bookme/web' dev",
+    "dev:api": "pnpm --filter @bookme/api dev",
+    "dev:web": "pnpm --filter @bookme/web dev",
     "dev": "pnpm --parallel --filter ./apps/* dev",
     "build": "pnpm --recursive run build"
   },
