@@ -1,8 +1,95 @@
 // use prisma-8
+enum UserRole {
+  CUSTOMER
+  BUSINESS_OWNER
+  ADMIN
+}
+
+enum BusinessType {
+  RESTAURANT
+  BARBERSHOP
+  COWORKING
+  SALON
+  FITNESS
+  MEDICAL
+  TUTORING
+}
+
+enum  BusinessStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum BookingStatus {
+  PENDING_PAYMENT
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+  EXPIRED
+}
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id        String           @id @default(uuid())
+  name      String  
+  email     String           @unique
+  password  String
+  role      UserRole        @default(CUSTOMER)
+  business  Business[]
+  bookings  Booking[]
   createdAt TimestamptzString @default(now())
-  updatedAt temporal.updatedAtString()
+  updatedAt temporal.updatedAt()
+}
+
+model Business {
+  id                      String          @id @default(uuid())
+  owner                   User            @relation(fields: [ownerId], references: [id])
+  ownerId                 String
+  name                    String
+  email                   String
+  phone                   String?
+  type                    BusinessType
+  status                  BusinessStatus  @default(PENDING)  
+  description             String?
+  locations               Location[]
+  cancellationWindowHours Int @default(24)
+  deletedAt               TimestamptzString?
+}
+
+model Location {
+  id            String    @id @default(uuid())
+  business      Business  @relation(fields: [businessId], references: [id])
+  businessId    String
+  country       String
+  city          String
+  address       String
+  timezone      String
+  openingHours  Json
+  resources     Resource[] 
+}
+
+model Resource {
+  id          String    @id @default(uuid())
+  location    Location  @relation(fields: [locationId], references: [id])
+  locationId  String  
+  name        String
+  price       Numeric(10, 2)
+  capacity    Int?
+  bookings    Booking[]
+}
+
+model Booking {
+  id                    String        @id @default(uuid())
+  customer              User          @relation(fields: [customerId], references: [id])
+  customerId            String
+  resource              Resource      @relation(fields: [resourceId], references: [id])
+  resourceId            String
+  startTime             TimestamptzString
+  endTime               TimestamptzString
+  totalAmount           Numeric(10, 2)
+  status                BookingStatus @default(PENDING_PAYMENT)
+  stripePaymentIntentId String?
+  deletedAt             TimestamptzString?
+  @@index([resourceId, startTime])
 }
