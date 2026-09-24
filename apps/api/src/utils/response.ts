@@ -1,11 +1,12 @@
-import { response, type Response } from "express";
+import type { Response } from "express";
 
 export function successResponse(
   res: Response,
+  status: number,
   data: any,
   message: string = "Success",
 ) {
-  return res.status(200).json({ success: true, data, message });
+  return res.status(status).json({ success: true, data, message });
 }
 
 export function errorResponse(res: Response, status: number, error: string) {
