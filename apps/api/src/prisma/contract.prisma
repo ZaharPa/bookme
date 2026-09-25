@@ -39,7 +39,7 @@ model User {
   business  Business[]
   bookings  Booking[]
   createdAt TimestamptzString @default(now())
-  updatedAt temporal.updatedAt()
+  updatedAt temporal.updatedAtString()
 }
 
 model Business {

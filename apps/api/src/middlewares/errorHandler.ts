@@ -8,5 +8,5 @@ export function errorHandler(
   next: NextFunction,
 ) {
   console.error(err);
-  errorResponse(res, 500, err);
+  errorResponse(res, 500, "Internal server error");
 }

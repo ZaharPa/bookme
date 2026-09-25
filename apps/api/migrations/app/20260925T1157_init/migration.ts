@@ -1,6 +1,6 @@
 #!/usr/bin/env -S node
-import type { Contract as End } from '../../snapshots/7ae2834a9213f8bac7ad004a574410a715cbf5eaa6b99e9a2caaf82bba981d5b/contract';
-import endContract from '../../snapshots/7ae2834a9213f8bac7ad004a574410a715cbf5eaa6b99e9a2caaf82bba981d5b/contract.json' with { type: 'json' };
+import type { Contract as End } from '../../snapshots/b284f2af3e1989badb9a894a1722e6f656e33ee16e883ba1339bdff711bd25bb/contract';
+import endContract from '../../snapshots/b284f2af3e1989badb9a894a1722e6f656e33ee16e883ba1339bdff711bd25bb/contract.json' with { type: 'json' };
 import {
   Migration,
   MigrationCLI,
@@ -136,7 +136,7 @@ export default class M extends Migration<never, End> {
           }),
           col('updatedAt', 'timestamptz', {
             notNull: true,
-            codecRef: { codecId: 'pg/timestamptz-temporal@1' },
+            codecRef: { codecId: 'pg/timestamptz-string@1' },
           }),
         ],
         constraints: [
