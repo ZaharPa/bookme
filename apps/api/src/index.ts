@@ -1,6 +1,7 @@
 import express from "express";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import authRouter from "./routes/auth.js";
+import businessRouter from "./routes/business.js";
 import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/auth", authRouter);
+app.use("/businesses", businessRouter);
 
 app.use(errorHandler);
 
