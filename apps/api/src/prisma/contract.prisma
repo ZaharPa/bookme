@@ -53,7 +53,10 @@ model Business {
   status                  BusinessStatus  @default(PENDING)  
   description             String?
   locations               Location[]
-  cancellationWindowHours Int @default(24)
+  cancellationWindowHours Int             @default(24)
+  viewCount               Int             @default(0)
+  createdAt TimestamptzString             @default(now())
+  updatedAt temporal.updatedAtString()  
   deletedAt               TimestamptzString?
 }
 
@@ -67,6 +70,8 @@ model Location {
   timezone      String
   openingHours  Json
   resources     Resource[] 
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
 }
 
 model Resource {
@@ -74,9 +79,11 @@ model Resource {
   location    Location  @relation(fields: [locationId], references: [id])
   locationId  String  
   name        String
-  price       Numeric(10, 2)
+  priceCents  Int
   capacity    Int?
   bookings    Booking[]
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
 }
 
 model Booking {
@@ -87,9 +94,11 @@ model Booking {
   resourceId            String
   startTime             TimestamptzString
   endTime               TimestamptzString
-  totalAmount           Numeric(10, 2)
+  totalAmountCents      Int
   status                BookingStatus @default(PENDING_PAYMENT)
   stripePaymentIntentId String?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
   deletedAt             TimestamptzString?
   @@index([resourceId, startTime])
 }

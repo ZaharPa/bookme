@@ -1,0 +1,44 @@
+[
+  {
+    "id": "column.public.business.viewCount",
+    "label": "Add column \"viewCount\" to \"business\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "viewCount",
+        "table": "business"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"viewCount\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "business",
+          "viewCount"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"viewCount\"",
+        "sql": "ALTER TABLE \"public\".\"business\" ADD COLUMN \"viewCount\" int4 DEFAULT 0 NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"viewCount\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "business",
+          "viewCount"
+        ]
+      }
+    ]
+  }
+]

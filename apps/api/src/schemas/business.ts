@@ -56,7 +56,7 @@ export const LocationSchema = z.object({
 export const ResourceSchema = z.object({
   capacity: z.int().min(1).max(10000),
   name: z.string().min(1).max(100),
-  price: z.number().min(0).max(9999999.99).multipleOf(0.01),
+  priceCents: z.number().min(0).max(9999999),
 });
 
 export type Business = z.infer<typeof BusinessSchema>;

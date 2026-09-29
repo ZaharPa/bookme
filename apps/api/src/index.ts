@@ -6,6 +6,7 @@ import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { initializeRedisClient } from "./redis/client.js";
+import { syncViewCounts } from "./jobs/syncViewCounts.js";
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -22,6 +23,9 @@ app.use(errorHandler);
 
 async function bootstrap() {
   await initializeRedisClient();
+  await syncViewCounts();
+
+  setInterval(syncViewCounts, 15 * 60 * 1000);
 
   app
     .listen(PORT, () => {

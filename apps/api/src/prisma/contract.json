@@ -129,6 +129,13 @@
         "models": {
           "Booking": {
             "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
               "customerId": {
                 "nullable": false,
                 "type": {
@@ -191,15 +198,18 @@
                   "kind": "scalar"
                 }
               },
-              "totalAmount": {
+              "totalAmountCents": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/numeric@1",
-                  "kind": "scalar",
-                  "typeParams": {
-                    "precision": 10,
-                    "scale": 2
-                  }
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
                 }
               }
             },
@@ -239,6 +249,9 @@
             },
             "storage": {
               "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
                 "customerId": {
                   "column": "customerId"
                 },
@@ -263,8 +276,11 @@
                 "stripePaymentIntentId": {
                   "column": "stripePaymentIntentId"
                 },
-                "totalAmount": {
-                  "column": "totalAmount"
+                "totalAmountCents": {
+                  "column": "totalAmountCents"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
                 }
               },
               "namespaceId": "public",
@@ -277,6 +293,13 @@
                 "nullable": false,
                 "type": {
                   "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
                   "kind": "scalar"
                 }
               },
@@ -354,6 +377,20 @@
                   "namespaceId": "public",
                   "plane": "domain"
                 }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "viewCount": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
               }
             },
             "relations": {
@@ -394,6 +431,9 @@
                 "cancellationWindowHours": {
                   "column": "cancellationWindowHours"
                 },
+                "createdAt": {
+                  "column": "createdAt"
+                },
                 "deletedAt": {
                   "column": "deletedAt"
                 },
@@ -420,6 +460,12 @@
                 },
                 "type": {
                   "column": "type"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "viewCount": {
+                  "column": "viewCount"
                 }
               },
               "namespaceId": "public",
@@ -456,6 +502,13 @@
                   "kind": "scalar"
                 }
               },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
@@ -474,6 +527,13 @@
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
                   "kind": "scalar"
                 }
               }
@@ -525,6 +585,9 @@
                 "country": {
                   "column": "country"
                 },
+                "createdAt": {
+                  "column": "createdAt"
+                },
                 "id": {
                   "column": "id"
                 },
@@ -533,6 +596,9 @@
                 },
                 "timezone": {
                   "column": "timezone"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
                 }
               },
               "namespaceId": "public",
@@ -545,6 +611,13 @@
                 "nullable": true,
                 "type": {
                   "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
                   "kind": "scalar"
                 }
               },
@@ -569,15 +642,18 @@
                   "kind": "scalar"
                 }
               },
-              "price": {
+              "priceCents": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/numeric@1",
-                  "kind": "scalar",
-                  "typeParams": {
-                    "precision": 10,
-                    "scale": 2
-                  }
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
                 }
               }
             },
@@ -619,6 +695,9 @@
                 "capacity": {
                   "column": "capacity"
                 },
+                "createdAt": {
+                  "column": "createdAt"
+                },
                 "id": {
                   "column": "id"
                 },
@@ -628,8 +707,11 @@
                 "name": {
                   "column": "name"
                 },
-                "price": {
-                  "column": "price"
+                "priceCents": {
+                  "column": "priceCents"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
                 }
               },
               "namespaceId": "public",
@@ -772,6 +854,15 @@
                 }
               ],
               "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
                 "customerId": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -822,14 +913,15 @@
                   "nativeType": "text",
                   "nullable": true
                 },
-                "totalAmount": {
-                  "codecId": "pg/numeric@1",
-                  "nativeType": "numeric",
-                  "nullable": false,
-                  "typeParams": {
-                    "precision": 10,
-                    "scale": 2
-                  }
+                "totalAmountCents": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
                 }
               },
               "foreignKeys": [
@@ -923,6 +1015,15 @@
                   "nativeType": "int4",
                   "nullable": false
                 },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
                 "deletedAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "nativeType": "timestamptz",
@@ -983,6 +1084,20 @@
                     "namespaceId": "public",
                     "plane": "storage"
                   }
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "viewCount": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
                 }
               },
               "foreignKeys": [
@@ -1042,6 +1157,15 @@
                   "nativeType": "text",
                   "nullable": false
                 },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
                 "id": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -1055,6 +1179,11 @@
                 "timezone": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
                   "nullable": false
                 }
               },
@@ -1100,6 +1229,15 @@
                   "nativeType": "int4",
                   "nullable": true
                 },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
                 "id": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -1115,14 +1253,15 @@
                   "nativeType": "text",
                   "nullable": false
                 },
-                "price": {
-                  "codecId": "pg/numeric@1",
-                  "nativeType": "numeric",
-                  "nullable": false,
-                  "typeParams": {
-                    "precision": 10,
-                    "scale": 2
-                  }
+                "priceCents": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
                 }
               },
               "foreignKeys": [
@@ -1281,10 +1420,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "b284f2af3e1989badb9a894a1722e6f656e33ee16e883ba1339bdff711bd25bb"
+    "storageHash": "a685da5e120fe6b16c5eaa5e0b41d9aaf67e0b528718ad90462cbc7a6bf32e64"
   },
   "execution": {
-    "executionHash": "5bec2a4dc0123f94bf8344d82a32999872fa3a1ad588afcc50e57776a3203d01",
+    "executionHash": "ade2d4b2ec4ed53dc0bcca0e621a745c817b6b7a37edd4b9a66d8ece3991a6a3",
     "mutations": {
       "defaults": [
         {
@@ -1294,6 +1433,21 @@
           },
           "ref": {
             "column": "id",
+            "namespace": "public",
+            "table": "booking"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
             "namespace": "public",
             "table": "booking"
           }
@@ -1311,6 +1465,21 @@
         },
         {
           "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "business"
+          }
+        },
+        {
+          "onCreate": {
             "id": "uuidv4",
             "kind": "generator"
           },
@@ -1322,11 +1491,41 @@
         },
         {
           "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "location"
+          }
+        },
+        {
+          "onCreate": {
             "id": "uuidv4",
             "kind": "generator"
           },
           "ref": {
             "column": "id",
+            "namespace": "public",
+            "table": "resource"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
             "namespace": "public",
             "table": "resource"
           }

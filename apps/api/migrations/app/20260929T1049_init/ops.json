@@ -41,7 +41,7 @@
     "execute": [
       {
         "description": "create table \"booking\"",
-        "sql": "CREATE TABLE \"public\".\"booking\" (\n  \"customerId\" text NOT NULL,\n  \"deletedAt\" timestamptz,\n  \"endTime\" timestamptz NOT NULL,\n  \"id\" text NOT NULL,\n  \"resourceId\" text NOT NULL,\n  \"startTime\" timestamptz NOT NULL,\n  \"status\" text DEFAULT 'PENDING_PAYMENT' NOT NULL,\n  \"stripePaymentIntentId\" text,\n  \"totalAmount\" numeric(10,2) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"booking_status_check_f52a6dd8\" CHECK (\"status\" IN ('PENDING_PAYMENT', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'NO_SHOW', 'EXPIRED'))\n)",
+        "sql": "CREATE TABLE \"public\".\"booking\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"customerId\" text NOT NULL,\n  \"deletedAt\" timestamptz,\n  \"endTime\" timestamptz NOT NULL,\n  \"id\" text NOT NULL,\n  \"resourceId\" text NOT NULL,\n  \"startTime\" timestamptz NOT NULL,\n  \"status\" text DEFAULT 'PENDING_PAYMENT' NOT NULL,\n  \"stripePaymentIntentId\" text,\n  \"totalAmountCents\" int4 NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"booking_status_check_f52a6dd8\" CHECK (\"status\" IN ('PENDING_PAYMENT', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'NO_SHOW', 'EXPIRED'))\n)",
         "params": []
       }
     ],
@@ -80,7 +80,7 @@
     "execute": [
       {
         "description": "create table \"business\"",
-        "sql": "CREATE TABLE \"public\".\"business\" (\n  \"cancellationWindowHours\" int4 DEFAULT 24 NOT NULL,\n  \"deletedAt\" timestamptz,\n  \"description\" text,\n  \"email\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"name\" text NOT NULL,\n  \"ownerId\" text NOT NULL,\n  \"phone\" text,\n  \"status\" text DEFAULT 'PENDING' NOT NULL,\n  \"type\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"business_status_check_56005a61\" CHECK (\"status\" IN ('PENDING', 'APPROVED', 'REJECTED')),\n  CONSTRAINT \"business_type_check_2158c376\" CHECK (\"type\" IN ('RESTAURANT', 'BARBERSHOP', 'COWORKING', 'SALON', 'FITNESS', 'MEDICAL', 'TUTORING'))\n)",
+        "sql": "CREATE TABLE \"public\".\"business\" (\n  \"cancellationWindowHours\" int4 DEFAULT 24 NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"deletedAt\" timestamptz,\n  \"description\" text,\n  \"email\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"name\" text NOT NULL,\n  \"ownerId\" text NOT NULL,\n  \"phone\" text,\n  \"status\" text DEFAULT 'PENDING' NOT NULL,\n  \"type\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"business_status_check_56005a61\" CHECK (\"status\" IN ('PENDING', 'APPROVED', 'REJECTED')),\n  CONSTRAINT \"business_type_check_2158c376\" CHECK (\"type\" IN ('RESTAURANT', 'BARBERSHOP', 'COWORKING', 'SALON', 'FITNESS', 'MEDICAL', 'TUTORING'))\n)",
         "params": []
       }
     ],
@@ -119,7 +119,7 @@
     "execute": [
       {
         "description": "create table \"location\"",
-        "sql": "CREATE TABLE \"public\".\"location\" (\n  \"address\" text NOT NULL,\n  \"businessId\" text NOT NULL,\n  \"city\" text NOT NULL,\n  \"country\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"openingHours\" json NOT NULL,\n  \"timezone\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "sql": "CREATE TABLE \"public\".\"location\" (\n  \"address\" text NOT NULL,\n  \"businessId\" text NOT NULL,\n  \"city\" text NOT NULL,\n  \"country\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" text NOT NULL,\n  \"openingHours\" json NOT NULL,\n  \"timezone\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
         "params": []
       }
     ],
@@ -158,7 +158,7 @@
     "execute": [
       {
         "description": "create table \"resource\"",
-        "sql": "CREATE TABLE \"public\".\"resource\" (\n  \"capacity\" int4,\n  \"id\" text NOT NULL,\n  \"locationId\" text NOT NULL,\n  \"name\" text NOT NULL,\n  \"price\" numeric(10,2) NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "sql": "CREATE TABLE \"public\".\"resource\" (\n  \"capacity\" int4,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" text NOT NULL,\n  \"locationId\" text NOT NULL,\n  \"name\" text NOT NULL,\n  \"priceCents\" int4 NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
         "params": []
       }
     ],

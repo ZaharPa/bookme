@@ -1,6 +1,6 @@
 #!/usr/bin/env -S node
-import type { Contract as End } from '../../snapshots/b284f2af3e1989badb9a894a1722e6f656e33ee16e883ba1339bdff711bd25bb/contract';
-import endContract from '../../snapshots/b284f2af3e1989badb9a894a1722e6f656e33ee16e883ba1339bdff711bd25bb/contract.json' with { type: 'json' };
+import type { Contract as End } from '../../snapshots/23ab91ae065dd0d367b71fd4c1e7b4d379b5f5b263953ee3e672cda91afba3b9/contract';
+import endContract from '../../snapshots/23ab91ae065dd0d367b71fd4c1e7b4d379b5f5b263953ee3e672cda91afba3b9/contract.json' with { type: 'json' };
 import {
   Migration,
   MigrationCLI,
@@ -21,6 +21,11 @@ export default class M extends Migration<never, End> {
         schema: 'public',
         table: 'booking',
         columns: [
+          col('createdAt', 'timestamptz', {
+            notNull: true,
+            default: fn('now()'),
+            codecRef: { codecId: 'pg/timestamptz-string@1' },
+          }),
           col('customerId', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('deletedAt', 'timestamptz', { codecRef: { codecId: 'pg/timestamptz-string@1' } }),
           col('endTime', 'timestamptz', {
@@ -39,9 +44,10 @@ export default class M extends Migration<never, End> {
             codecRef: { codecId: 'pg/text@1' },
           }),
           col('stripePaymentIntentId', 'text', { codecRef: { codecId: 'pg/text@1' } }),
-          col('totalAmount', 'numeric(10,2)', {
+          col('totalAmountCents', 'int4', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
+          col('updatedAt', 'timestamptz', {
             notNull: true,
-            codecRef: { codecId: 'pg/numeric@1', typeParams: { precision: 10, scale: 2 } },
+            codecRef: { codecId: 'pg/timestamptz-string@1' },
           }),
         ],
         constraints: [
@@ -61,6 +67,11 @@ export default class M extends Migration<never, End> {
             default: lit(24),
             codecRef: { codecId: 'pg/int4@1' },
           }),
+          col('createdAt', 'timestamptz', {
+            notNull: true,
+            default: fn('now()'),
+            codecRef: { codecId: 'pg/timestamptz-string@1' },
+          }),
           col('deletedAt', 'timestamptz', { codecRef: { codecId: 'pg/timestamptz-string@1' } }),
           col('description', 'text', { codecRef: { codecId: 'pg/text@1' } }),
           col('email', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
@@ -74,6 +85,10 @@ export default class M extends Migration<never, End> {
             codecRef: { codecId: 'pg/text@1' },
           }),
           col('type', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
+          col('updatedAt', 'timestamptz', {
+            notNull: true,
+            codecRef: { codecId: 'pg/timestamptz-string@1' },
+          }),
         ],
         constraints: [
           primaryKey(['id']),
@@ -95,9 +110,18 @@ export default class M extends Migration<never, End> {
           col('businessId', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('city', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('country', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
+          col('createdAt', 'timestamptz', {
+            notNull: true,
+            default: fn('now()'),
+            codecRef: { codecId: 'pg/timestamptz-string@1' },
+          }),
           col('id', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('openingHours', 'json', { notNull: true, codecRef: { codecId: 'pg/json@1' } }),
           col('timezone', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
+          col('updatedAt', 'timestamptz', {
+            notNull: true,
+            codecRef: { codecId: 'pg/timestamptz-string@1' },
+          }),
         ],
         constraints: [primaryKey(['id'])],
       }),
@@ -106,12 +130,18 @@ export default class M extends Migration<never, End> {
         table: 'resource',
         columns: [
           col('capacity', 'int4', { codecRef: { codecId: 'pg/int4@1' } }),
+          col('createdAt', 'timestamptz', {
+            notNull: true,
+            default: fn('now()'),
+            codecRef: { codecId: 'pg/timestamptz-string@1' },
+          }),
           col('id', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('locationId', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
           col('name', 'text', { notNull: true, codecRef: { codecId: 'pg/text@1' } }),
-          col('price', 'numeric(10,2)', {
+          col('priceCents', 'int4', { notNull: true, codecRef: { codecId: 'pg/int4@1' } }),
+          col('updatedAt', 'timestamptz', {
             notNull: true,
-            codecRef: { codecId: 'pg/numeric@1', typeParams: { precision: 10, scale: 2 } },
+            codecRef: { codecId: 'pg/timestamptz-string@1' },
           }),
         ],
         constraints: [primaryKey(['id'])],
