@@ -45,3 +45,33 @@ export async function locationCheck(
     next(error);
   }
 }
+
+export async function resourceCheck(
+  req: Request<{ resourceId: string }>,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const resource = await db.orm.public.Resource.where({
+      id: req.params.resourceId,
+    }).first();
+    if (!resource) return errorResponse(res, 404, "Resource not found");
+
+    const location = await db.orm.public.Location.where({
+      id: resource?.locationId,
+    }).first();
+    if (!location) return errorResponse(res, 404, "Location not found");
+
+    const business = await db.orm.public.Business.where({
+      id: location.businessId,
+    }).first();
+    if (!business) return errorResponse(res, 404, "Business not found");
+
+    if (business.ownerId !== req.user?.userId) {
+      return errorResponse(res, 403, "Access denied");
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+}

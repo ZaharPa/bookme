@@ -40,6 +40,7 @@ model User {
   bookings  Booking[]
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()
+  deletedAt TimestamptzString?
 }
 
 model Business {
@@ -55,8 +56,8 @@ model Business {
   locations               Location[]
   cancellationWindowHours Int             @default(24)
   viewCount               Int             @default(0)
-  createdAt TimestamptzString             @default(now())
-  updatedAt temporal.updatedAtString()  
+  createdAt               TimestamptzString             @default(now())
+  updatedAt               temporal.updatedAtString()  
   deletedAt               TimestamptzString?
 }
 
@@ -70,8 +71,9 @@ model Location {
   timezone      String
   openingHours  Json
   resources     Resource[] 
-  createdAt TimestamptzString @default(now())
-  updatedAt temporal.updatedAtString()
+  createdAt     TimestamptzString @default(now())
+  updatedAt     temporal.updatedAtString()
+  deletedAt     TimestamptzString?
 }
 
 model Resource {
@@ -82,8 +84,9 @@ model Resource {
   priceCents  Int
   capacity    Int?
   bookings    Booking[]
-  createdAt TimestamptzString @default(now())
-  updatedAt temporal.updatedAtString()
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+  deletedAt   TimestamptzString?
 }
 
 model Booking {

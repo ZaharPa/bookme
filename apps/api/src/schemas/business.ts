@@ -59,6 +59,13 @@ export const ResourceSchema = z.object({
   priceCents: z.number().min(0).max(9999999),
 });
 
+export const BusinessUpdateSchema = BusinessSchema.partial();
+export const LocationUpdateSchema = LocationSchema.partial();
+export const ResourceUpdateSchema = ResourceSchema.partial();
+
 export type Business = z.infer<typeof BusinessSchema>;
 export type Location = z.infer<typeof LocationSchema>;
 export type Resource = z.infer<typeof ResourceSchema>;
+export type BusinessUpdate = z.infer<typeof BusinessUpdateSchema>;
+export type LocationUpdate = z.infer<typeof LocationUpdateSchema>;
+export type ResourceUpdate = z.infer<typeof ResourceUpdateSchema>;
