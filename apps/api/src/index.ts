@@ -25,7 +25,16 @@ async function bootstrap() {
   await initializeRedisClient();
   await syncViewCounts();
 
-  setInterval(syncViewCounts, 15 * 60 * 1000);
+  setInterval(
+    async () => {
+      try {
+        await syncViewCounts();
+      } catch (error) {
+        console.error("syncViewCounts failed", error);
+      }
+    },
+    15 * 60 * 1000,
+  );
 
   app
     .listen(PORT, () => {

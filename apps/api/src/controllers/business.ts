@@ -91,18 +91,13 @@ export async function viewBusiness(
 
   const redis = await initializeRedisClient();
   const viewerKey = `business:viewed:${business.id}:${req.ip}`;
-  const alreadyViewed = await redis.get(viewerKey);
+  const isNewView = await redis.set(viewerKey, "1", {
+    EX: 60 * 60 * 24,
+    NX: true,
+  });
 
-  if (!alreadyViewed) {
-    const viewsKey = `business:views:${business.id}`;
-
+  if (isNewView) {
     await redis.incr(`business:views:${business.id}`);
-    await redis.set(viewerKey, "1", { EX: 60 * 60 * 24 });
-    console.log("View counted:", {
-      viewsKey,
-      viewerKey,
-      count: await redis.get(viewsKey),
-    });
   }
 
   return successResponse(res, 200, business);

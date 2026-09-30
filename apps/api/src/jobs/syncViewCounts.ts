@@ -3,24 +3,30 @@ import { initializeRedisClient } from "../redis/client";
 
 export async function syncViewCounts() {
   const redis = await initializeRedisClient();
-  const keys = await redis.keys("business:views:*");
 
-  for (const key of keys) {
-    const businessId = key.split(":")[2];
+  for await (const keys of redis.scanIterator({
+    MATCH: "business:views:*",
+    COUNT: 100,
+  })) {
+    for (const key of keys) {
+      const businessId = key.split(":")[2];
 
-    const value = await redis.getDel(key);
-    const count = Number(value);
+      const value = await redis.get(key);
+      const count = Number(value);
 
-    if (!count) continue;
+      if (!count) continue;
 
-    const business = await db.orm.public.Business.where({
-      id: businessId,
-    }).first();
+      const business = await db.orm.public.Business.where({
+        id: businessId,
+      }).first();
 
-    if (!business) continue;
+      if (!business) continue;
 
-    await db.orm.public.Business.where({ id: businessId }).update({
-      viewCount: business.viewCount + count,
-    });
+      await db.orm.public.Business.where({ id: businessId }).update({
+        viewCount: business.viewCount + count,
+      });
+
+      await redis.decrBy(key, count);
+    }
   }
 }
