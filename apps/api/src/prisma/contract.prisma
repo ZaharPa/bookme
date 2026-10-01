@@ -41,6 +41,7 @@ model User {
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()
   deletedAt TimestamptzString?
+  bannedAt TimestamptzString?
 }
 
 model Business {

@@ -1,12 +1,14 @@
 import express from "express";
-import { errorHandler } from "./middlewares/errorHandler.js";
-import authRouter from "./routes/auth.js";
-import businessRouter from "./routes/business.js";
 import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { initializeRedisClient } from "./redis/client.js";
 import { syncViewCounts } from "./jobs/syncViewCounts.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
+import { requireAuth, requireRole } from "./middlewares/authHandler.js";
+import authRouter from "./routes/auth.js";
+import businessRouter from "./routes/business.js";
+import adminRouter from "./routes/admin.js";
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -18,6 +20,7 @@ app.use(cookieParser());
 
 app.use("/auth", authRouter);
 app.use("/businesses", businessRouter);
+app.use("/admin", requireAuth, requireRole("ADMIN"), adminRouter);
 
 app.use(errorHandler);
 

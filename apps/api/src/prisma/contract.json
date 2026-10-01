@@ -740,6 +740,13 @@
           },
           "User": {
             "fields": {
+              "bannedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
               "createdAt": {
                 "nullable": false,
                 "type": {
@@ -837,6 +844,9 @@
             },
             "storage": {
               "fields": {
+                "bannedAt": {
+                  "column": "bannedAt"
+                },
                 "createdAt": {
                   "column": "createdAt"
                 },
@@ -1348,6 +1358,11 @@
                 }
               ],
               "columns": {
+                "bannedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
                 "createdAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "default": {
@@ -1465,7 +1480,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "ded8b531875f394b8d2d4139a5d5989f5e13ea593522a00cbc84d8a8ca6d03d0"
+    "storageHash": "6b21fffc3327cacbe8722b3bf340f416f35c5873a49015bf6f664f94b644de30"
   },
   "execution": {
     "executionHash": "ade2d4b2ec4ed53dc0bcca0e621a745c817b6b7a37edd4b9a66d8ece3991a6a3",

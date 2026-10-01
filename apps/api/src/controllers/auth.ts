@@ -26,6 +26,7 @@ export async function login(req: Request<{}, {}, Login>, res: Response) {
   if (!user || !(await verifyPassword(password, user.password))) {
     return errorResponse(res, 401, "Invalid email or password");
   }
+  if (user.bannedAt) return errorResponse(res, 403, "User is banned");
 
   const accessToken = generateAccessToken(user.id, user.role);
   const refreshToken = generateRefreshToken(user.id);
@@ -88,10 +89,11 @@ export async function refresh(req: Request, res: Response) {
       EX: remaining,
       NX: true,
     });
-    if (claimed) return errorResponse(res, 401, "Token revoked");
+    if (!claimed) return errorResponse(res, 401, "Token revoked");
 
     const user = await db.orm.public.User.where({ id: payload.userId }).first();
     if (!user) return errorResponse(res, 401, "User not found");
+    if (user.bannedAt) return errorResponse(res, 403, "User is banned");
 
     const accessToken = generateAccessToken(user.id, user.role);
     const newRefresh = generateRefreshToken(user.id);

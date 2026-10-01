@@ -48,7 +48,7 @@ export async function addResource(
 
 export async function viewAllBusinesses(req: Request, res: Response) {
   const page = Math.max(1, Math.floor(Number(req.query.page)) || 1);
-  const perPage = 2;
+  const perPage = 10;
 
   const businesses = await db.orm.public.Business.where({
     status: "APPROVED",
@@ -61,7 +61,7 @@ export async function viewAllBusinesses(req: Request, res: Response) {
           resource.where({ deletedAt: null }),
         ),
     )
-    .orderBy((p) => p.createdAt.desc())
+    .orderBy((b) => b.createdAt.desc())
     .limit(perPage)
     .offset((page - 1) * perPage)
     .all();
