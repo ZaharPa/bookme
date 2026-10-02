@@ -9,6 +9,7 @@ import { requireAuth, requireRole } from "./middlewares/authHandler.js";
 import authRouter from "./routes/auth.js";
 import businessRouter from "./routes/business.js";
 import adminRouter from "./routes/admin.js";
+import bookingRouter from "./routes/booking.js";
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -21,6 +22,7 @@ app.use(cookieParser());
 app.use("/auth", authRouter);
 app.use("/businesses", businessRouter);
 app.use("/admin", requireAuth, requireRole("ADMIN"), adminRouter);
+app.use("/bookings", bookingRouter);
 
 app.use(errorHandler);
 
