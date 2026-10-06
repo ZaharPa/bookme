@@ -3,6 +3,7 @@ import { errorResponse, successResponse } from "../utils/response";
 import type Stripe from "stripe";
 import { stripe } from "../utils/stripe";
 import { db } from "../prisma/db";
+import { HOLD_MINUTES } from "../config/booking";
 
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -23,10 +24,16 @@ export async function stripeWebhook(req: Request, res: Response) {
     const intent = event.data.object as Stripe.PaymentIntent;
     const bookingId = intent.metadata.bookingId;
 
+    const holdCutoff = new Date(
+      Date.now() - HOLD_MINUTES * 60000,
+    ).toISOString();
+
     const cofrimed = await db.orm.public.Booking.where({
       id: bookingId,
       status: "PENDING_PAYMENT",
-    }).update({ status: "CONFIRMED" });
+    })
+      .where((b) => b.createdAt.gte(holdCutoff))
+      .update({ status: "CONFIRMED" });
 
     if (!cofrimed) {
       await stripe.paymentIntents.cancel(intent.id);

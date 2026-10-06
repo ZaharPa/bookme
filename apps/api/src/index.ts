@@ -31,7 +31,7 @@ app.use(cookieParser());
 app.use("/auth", authRouter);
 app.use("/businesses", businessRouter);
 app.use("/admin", requireAuth, requireRole("ADMIN"), adminRouter);
-app.use("/bookings", bookingRouter);
+app.use("/bookings", requireAuth, bookingRouter);
 
 app.use(errorHandler);
 

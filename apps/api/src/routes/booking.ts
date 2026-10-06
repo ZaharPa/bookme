@@ -1,16 +1,26 @@
 import express from "express";
-import { requireAuth } from "../middlewares/authHandler";
-import { createBooking } from "../controllers/booking";
+import {
+  cancelBooking,
+  createBooking,
+  viewBooking,
+  viewBusinessBookings,
+  viewMyBookings,
+} from "../controllers/booking";
 import { validate } from "../middlewares/validate";
-import { BookingSchema } from "../schemas/booking";
+import { BookingSchema, BookingStatusSchema } from "../schemas/booking";
+import { changeBusinessStatus } from "../controllers/admin";
 
 const router: express.Router = express.Router();
 
-router.get("/mine", requireAuth);
-router.get("/business/mine", requireAuth);
-router.get("/:bookingId", requireAuth);
-router.post("/", requireAuth, validate(BookingSchema), createBooking);
-router.patch("/:bookingId/status", requireAuth);
-router.patch("/:bookingId/cancel", requireAuth);
+router.get("/mine", viewMyBookings);
+router.get("/business/mine", viewBusinessBookings);
+router.get("/:bookingId", viewBooking);
+router.post("/", validate(BookingSchema), createBooking);
+router.patch(
+  "/:bookingId/status",
+  validate(BookingStatusSchema),
+  changeBusinessStatus,
+);
+router.patch("/:bookingId/cancel", cancelBooking);
 
 export default router;
