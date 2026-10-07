@@ -768,6 +768,13 @@
                   "kind": "scalar"
                 }
               },
+              "emailVerifiedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
@@ -855,6 +862,9 @@
                 },
                 "email": {
                   "column": "email"
+                },
+                "emailVerifiedAt": {
+                  "column": "emailVerifiedAt"
                 },
                 "id": {
                   "column": "id"
@@ -1382,6 +1392,11 @@
                   "nativeType": "text",
                   "nullable": false
                 },
+                "emailVerifiedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
                 "id": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -1480,7 +1495,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "6b21fffc3327cacbe8722b3bf340f416f35c5873a49015bf6f664f94b644de30"
+    "storageHash": "d9c3bd2cb1648c5ea9dc88e9a571c2bb32c933374fe7c895ac35aebd7730ede8"
   },
   "execution": {
     "executionHash": "ade2d4b2ec4ed53dc0bcca0e621a745c817b6b7a37edd4b9a66d8ece3991a6a3",

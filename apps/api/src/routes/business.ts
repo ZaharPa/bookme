@@ -1,5 +1,5 @@
 import express from "express";
-import { requireAuth } from "../middlewares/authHandler";
+import { requireAuth, requireVerified } from "../middlewares/authHandler";
 import { validate } from "../middlewares/validate";
 import {
   BusinessSchema,
@@ -31,7 +31,13 @@ import {
 
 const router: express.Router = express.Router();
 
-router.post("/", requireAuth, validate(BusinessSchema), addBusiness);
+router.post(
+  "/",
+  requireAuth,
+  requireVerified,
+  validate(BusinessSchema),
+  addBusiness,
+);
 router.post(
   "/:businessId/locations",
   requireAuth,

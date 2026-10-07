@@ -6,9 +6,17 @@ import {
   generateRefreshToken,
   verifyRefreshToken,
 } from "../utils/tokens";
-import type { Login, Registartion } from "../schemas/auth";
+import type {
+  ForgetPassword,
+  Login,
+  Registartion,
+  ResetPassword,
+  VerifyEmail,
+} from "../schemas/auth";
 import { errorResponse, successResponse } from "../utils/response";
 import { initializeRedisClient } from "../redis/client";
+import { sendVerificationEmail } from "../utils/emailVerification";
+import { sendForgetEmail } from "../utils/forgetEmail";
 
 const REFRESH_COOKIE_OPTIONS = {
   httpOnly: true,
@@ -37,7 +45,12 @@ export async function login(req: Request<{}, {}, Login>, res: Response) {
     200,
     {
       accessToken,
-      user: { id: user.id, name: user.name, role: user.role },
+      user: {
+        id: user.id,
+        name: user.name,
+        role: user.role,
+        emailVerified: Boolean(user.emailVerifiedAt),
+      },
     },
     "Logged in successfully",
   );
@@ -70,7 +83,12 @@ export async function register(
     201,
     {
       accessToken,
-      user: { id: user.id, name: user.name, role: user.role },
+      user: {
+        id: user.id,
+        name: user.name,
+        role: user.role,
+        emailVerified: false,
+      },
     },
     "Registered successfully",
   );
@@ -124,4 +142,90 @@ export async function logout(req: Request, res: Response) {
     maxAge: undefined,
   });
   return successResponse(res, 200, null, "Logged out");
+}
+
+export async function sendVerification(req: Request, res: Response) {
+  const user = await db.orm.public.User.where({ id: req.user!.userId }).first();
+  if (!user) return errorResponse(res, 404, "User not found");
+
+  if (user.emailVerifiedAt)
+    return errorResponse(res, 409, "Email is already verified");
+
+  const redis = await initializeRedisClient();
+  const allowed = await redis.set(`verify:cooldown:${user.id}`, "1", {
+    EX: 60,
+    NX: true,
+  });
+  if (!allowed)
+    return errorResponse(
+      res,
+      429,
+      "Wait a minute before requesting another email",
+    );
+
+  await sendVerificationEmail(user.id, user.email);
+  return successResponse(res, 200, null, "Verification email sent");
+}
+
+export async function verifyEmail(
+  req: Request<{}, {}, VerifyEmail>,
+  res: Response,
+) {
+  const redis = await initializeRedisClient();
+
+  const userId = await redis.getDel(`verify:${req.body.token}`);
+  if (!userId) return errorResponse(res, 400, "Invalid or expired token");
+
+  const user = await db.orm.public.User.where({ id: userId }).update({
+    emailVerifiedAt: new Date().toISOString(),
+  });
+  if (!user) return errorResponse(res, 404, "User not found");
+
+  return successResponse(res, 200, null, "Email verified successfully");
+}
+
+export async function forgetPassword(
+  req: Request<{}, {}, ForgetPassword>,
+  res: Response,
+) {
+  const user = await db.orm.public.User.where({
+    email: req.body.email,
+  }).first();
+
+  if (user) {
+    const redis = await initializeRedisClient();
+    const allowed = await redis.set(`reset:cooldown:${user.id}`, "1", {
+      EX: 60,
+      NX: true,
+    });
+
+    if (allowed) {
+      try {
+        await sendForgetEmail(user.id, user.email);
+      } catch (error) {
+        console.error("Failed to set email", error);
+      }
+    }
+  }
+
+  return successResponse(res, 200, null, "Reset link has been sent");
+}
+
+export async function resetPassword(
+  req: Request<{}, {}, ResetPassword>,
+  res: Response,
+) {
+  const redis = await initializeRedisClient();
+
+  const userId = await redis.getDel(`reset:${req.body.token}`);
+  if (!userId) return errorResponse(res, 400, "Invalid or expired token");
+
+  const hashedPassword = await hashPassword(req.body.newPassword);
+
+  const user = await db.orm.public.User.where({ id: userId }).update({
+    password: hashedPassword,
+  });
+  if (!user) return errorResponse(res, 404, "User not found");
+
+  return successResponse(res, 200, null, "Password has been reset");
 }

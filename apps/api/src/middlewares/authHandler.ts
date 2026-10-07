@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { verifyAccessToken } from "../utils/tokens";
 import { errorResponse } from "../utils/response";
+import { db } from "../prisma/db";
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
@@ -24,4 +25,20 @@ export function requireRole(...roles: string[]) {
     }
     next();
   };
+}
+
+export async function requireVerified(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  const user = await db.orm.public.User.where({
+    id: req.user!.userId,
+  }).first();
+
+  if (!user?.emailVerifiedAt) {
+    return errorResponse(res, 403, "Verify email first");
+  }
+
+  next();
 }
