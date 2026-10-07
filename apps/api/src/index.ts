@@ -17,6 +17,7 @@ import { expireBookings } from "./jobs/expireBookings.js";
 const PORT = process.env.PORT || 3000;
 const app = express();
 
+app.set("trust proxy", Number(process.env.TRUST_PROXY ?? 0));
 app.use(helmet());
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 

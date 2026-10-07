@@ -30,5 +30,13 @@ export const BookingStatusSchema = z.object({
   status: z.enum(["COMPLETED", "NO_SHOW"]),
 });
 
+export const AvailabilityQuerySchema = z
+  .object({
+    from: z.coerce.date(),
+    to: z.coerce.date(),
+  })
+  .refine((d) => d.from < d.to, { error: "from must be before to" });
+
 export type Booking = z.infer<typeof BookingSchema>;
 export type BookingStatus = z.infer<typeof BookingStatusSchema>;
+export type AvailabilityQuery = z.infer<typeof AvailabilityQuerySchema>;

@@ -2,10 +2,14 @@ import type { Request, Response } from "express";
 import { db } from "../prisma/db";
 import { errorResponse, successResponse } from "../utils/response";
 import { acquireLock, releaseLock } from "../redis/lock";
-import type { Booking, BookingStatus } from "../schemas/booking";
+import {
+  AvailabilityQuerySchema,
+  type Booking,
+  type BookingStatus,
+} from "../schemas/booking";
 import { and, or } from "@prisma/orm-postgres/orm-client";
 import { isWithinOpeningHours, type OpeningHours } from "../utils/openingHours";
-import { HOLD_MINUTES } from "../config/booking";
+import { HOLD_MINUTES, MAX_DAYS_AHEAD } from "../config/booking";
 import { stripe } from "../utils/stripe";
 
 export async function createBooking(
@@ -16,6 +20,14 @@ export async function createBooking(
 
   if (startTime <= new Date()) {
     return errorResponse(res, 400, "Start time must be in future");
+  }
+
+  if (startTime.getTime() > Date.now() + MAX_DAYS_AHEAD * 24 * 3600 * 1000) {
+    return errorResponse(
+      res,
+      400,
+      `Booking are allowed up to ${MAX_DAYS_AHEAD} days`,
+    );
   }
 
   const resource = await db.orm.public.Resource.where({
@@ -170,6 +182,31 @@ export async function viewBooking(
     id: req.params.bookingId,
   }).first();
 
+  if (!booking) return errorResponse(res, 404, "Booking not found");
+
+  const userId = req.user!.userId;
+  const isCustomer = booking.customerId === userId;
+  const isAdmin = req.user!.role === "ADMIN";
+
+  let isOwner = false;
+  if (!isCustomer && !isAdmin) {
+    const resource = await db.orm.public.Resource.where({
+      id: booking.resourceId,
+    }).first();
+    const location =
+      resource &&
+      (await db.orm.public.Location.where({
+        id: resource?.locationId,
+      }).first());
+    const business =
+      location &&
+      (await db.orm.public.Business.where({ id: location.businessId }).first());
+    isOwner = business?.ownerId === userId;
+  }
+
+  if (!isCustomer && !isAdmin && !isOwner) {
+    return errorResponse(res, 404, "Booking not found");
+  }
   return successResponse(res, 200, booking);
 }
 
@@ -286,4 +323,42 @@ export async function updateBookingStatus(
   }
 
   return successResponse(res, 200, updated, "Booking status updated");
+}
+
+export async function viewAvailability(
+  req: Request<{ resourceId: string }>,
+  res: Response,
+) {
+  const parsed = AvailabilityQuerySchema.safeParse(req.query);
+  if (!parsed.success) return errorResponse(res, 400, "Invalid date range");
+
+  const resource = await db.orm.public.Resource.where({
+    id: req.params.resourceId,
+    deletedAt: null,
+  }).first();
+  if (!resource) return errorResponse(res, 404, "Resource not found");
+
+  const from = parsed.data.from.toISOString();
+  const to = parsed.data.to.toISOString();
+  const holdCutoff = new Date(Date.now() - HOLD_MINUTES * 60000).toISOString();
+
+  const booked = await db.orm.public.Booking.where({
+    resourceId: resource.id,
+  })
+    .where((b) => b.startTime.lt(to))
+    .where((b) => b.endTime.gt(from))
+    .where((b) =>
+      or(
+        b.status.eq("CONFIRMED"),
+        and(b.status.eq("PENDING_PAYMENT"), b.createdAt.gte(holdCutoff)),
+      ),
+    )
+    .select("startTime", "endTime")
+    .orderBy((b) => b.startTime.asc())
+    .all();
+
+  return successResponse(res, 200, {
+    capacity: resource.capacity ?? 1,
+    booked,
+  });
 }

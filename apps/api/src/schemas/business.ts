@@ -20,7 +20,7 @@ const dayHours = z
 const openingHoursSchema = z.object({
   mon: dayHours,
   tue: dayHours,
-  wen: dayHours,
+  wed: dayHours,
   thu: dayHours,
   fri: dayHours,
   sat: dayHours,

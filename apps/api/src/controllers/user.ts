@@ -27,6 +27,7 @@ export async function changePassword(
 
   await db.orm.public.User.where({ id: user.id }).update({
     password: hashedPassword,
+    passwordChangetAt: new Date().toISOString(),
   });
 
   return successResponse(res, 200, null, "Password updated successfully");

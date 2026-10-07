@@ -5,7 +5,7 @@ import { userPasswordSchema } from "../schemas/user";
 
 const router: express.Router = express.Router();
 
-router.get("/", me);
+router.get("/me", me);
 router.patch("/password", validate(userPasswordSchema), changePassword);
 
 export default router;

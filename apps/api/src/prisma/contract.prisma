@@ -31,18 +31,19 @@ enum BookingStatus {
 }
 
 model User {
-  id              String           @id @default(uuid())
-  name            String  
-  email           String           @unique
-  password        String
-  role            UserRole        @default(CUSTOMER)
-  business        Business[]
-  bookings        Booking[]
-  createdAt       TimestamptzString @default(now())
-  updatedAt       temporal.updatedAtString()
-  emailVerifiedAt TimestamptzString?
-  deletedAt       TimestamptzString?
-  bannedAt        TimestamptzString?
+  id                String                    @id @default(uuid())
+  name              String  
+  email             String                    @unique
+  password          String
+  role              UserRole                  @default(CUSTOMER)
+  business          Business[]
+  bookings          Booking[]
+  createdAt         TimestamptzString         @default(now())
+  updatedAt         temporal.updatedAtString()
+  emailVerifiedAt   TimestamptzString?
+  passwordChangetAt TimestamptzString?
+  deletedAt         TimestamptzString?
+  bannedAt          TimestamptzString?
 }
 
 model Business {

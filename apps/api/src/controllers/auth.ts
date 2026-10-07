@@ -112,6 +112,14 @@ export async function refresh(req: Request, res: Response) {
     const user = await db.orm.public.User.where({ id: payload.userId }).first();
     if (!user) return errorResponse(res, 401, "User not found");
     if (user.bannedAt) return errorResponse(res, 403, "User is banned");
+    if (user.passwordChangetAt) {
+      const changedAt = Math.floor(
+        new Date(user.passwordChangetAt).getTime() / 1000,
+      );
+      if (payload.iat < changedAt) {
+        return errorResponse(res, 401, "Password was changed, log in again");
+      }
+    }
 
     const accessToken = generateAccessToken(user.id, user.role);
     const newRefresh = generateRefreshToken(user.id);
@@ -224,6 +232,7 @@ export async function resetPassword(
 
   const user = await db.orm.public.User.where({ id: userId }).update({
     password: hashedPassword,
+    passwordChangetAt: new Date().toISOString(),
   });
   if (!user) return errorResponse(res, 404, "User not found");
 

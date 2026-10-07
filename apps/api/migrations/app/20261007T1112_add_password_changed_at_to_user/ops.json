@@ -1,0 +1,44 @@
+[
+  {
+    "id": "column.public.user.passwordChangetAt",
+    "label": "Add column \"passwordChangetAt\" to \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "passwordChangetAt",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"passwordChangetAt\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "passwordChangetAt"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"passwordChangetAt\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD COLUMN \"passwordChangetAt\" timestamptz"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"passwordChangetAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "user",
+          "passwordChangetAt"
+        ]
+      }
+    ]
+  }
+]

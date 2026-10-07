@@ -33,5 +33,6 @@ export function verifyRefreshToken(token: string) {
     userId: string;
     jti: string;
     exp: number;
+    iat: number;
   };
 }

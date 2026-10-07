@@ -17,36 +17,42 @@ import {
   sendVerification,
   verifyEmail,
 } from "../controllers/auth";
-import { authLimiter } from "../middlewares/rateLimit";
 import { requireAuth } from "../middlewares/authHandler";
+import {
+  emailLimiter,
+  loginLimiter,
+  passwordLimiter,
+  refreshLimiter,
+  registerLimiter,
+} from "../middlewares/rateLimit";
 
 const router: express.Router = express.Router();
 
-router.post("/login", authLimiter, validate(LoginSchema), login);
+router.post("/login", loginLimiter, validate(LoginSchema), login);
 router.post(
-  "/registarion",
-  authLimiter,
+  "/registration",
+  registerLimiter,
   validate(RegistrationSchema),
   register,
 );
-router.post("/refresh", refresh);
+router.post("/refresh", refreshLimiter, refresh);
 router.post("/logout", logout);
-router.post("/send-verification", authLimiter, requireAuth, sendVerification);
+router.post("/send-verification", emailLimiter, requireAuth, sendVerification);
 router.post(
   "/verify-email",
-  authLimiter,
+  emailLimiter,
   validate(VerifyEmailSchema),
   verifyEmail,
 );
 router.post(
   "/forget-password",
-  authLimiter,
+  passwordLimiter,
   validate(ForgetPasswordSchema),
   forgetPassword,
 );
 router.post(
   "/reset-password",
-  authLimiter,
+  passwordLimiter,
   validate(ResetPasswordSchema),
   resetPassword,
 );

@@ -28,6 +28,7 @@ import {
   deleteBusiness,
   deleteResource,
 } from "../controllers/business";
+import { viewAvailability } from "../controllers/booking";
 
 const router: express.Router = express.Router();
 
@@ -52,11 +53,10 @@ router.post(
   validate(ResourceSchema),
   addResource,
 );
-
 router.get("/", viewAllBusinesses);
 router.get("/mine", requireAuth, viewMyBusiness);
 router.get("/:businessId", viewBusiness);
-
+router.get("/availability/:resourceId", viewAvailability);
 router.patch(
   "/:businessId",
   requireAuth,
@@ -78,7 +78,6 @@ router.patch(
   validate(ResourceUpdateSchema),
   updateResource,
 );
-
 router.delete("/:businessId", requireAuth, businessOwner, deleteBusiness);
 router.delete(
   "/:businessId/:locationId",

@@ -49,9 +49,23 @@ export async function stats(req: Request, res: Response) {
     .where((b) => b.createdAt.lt(to))
     .aggregate((a) => ({ total: a.count() }));
 
+  const bookings = await db.orm.public.Booking.where((b) =>
+    b.createdAt.gte(from),
+  )
+    .where((b) => b.createdAt.lt(to))
+    .where((b) => b.status.in(["COMPLETED", "CONFIRMED"]))
+    .aggregate((a) => ({
+      total: a.count(),
+      amountCents: a.sum("totalAmountCents"),
+    }));
+
   return successResponse(res, 200, {
     newUsers: users.total,
     newBusinesses: businesses.total,
+    bookings: {
+      count: bookings.total,
+      totalCents: bookings.amountCents ?? 0,
+    },
   });
 }
 
