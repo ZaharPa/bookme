@@ -10,6 +10,7 @@ import authRouter from "./routes/auth.js";
 import businessRouter from "./routes/business.js";
 import adminRouter from "./routes/admin.js";
 import bookingRouter from "./routes/booking.js";
+import userRouter from "./routes/user.js";
 import { stripeWebhook } from "./controllers/webhooks.js";
 import { expireBookings } from "./jobs/expireBookings.js";
 
@@ -32,6 +33,7 @@ app.use("/auth", authRouter);
 app.use("/businesses", businessRouter);
 app.use("/admin", requireAuth, requireRole("ADMIN"), adminRouter);
 app.use("/bookings", requireAuth, bookingRouter);
+app.use("/users", requireAuth, userRouter);
 
 app.use(errorHandler);
 
@@ -56,7 +58,7 @@ async function bootstrap() {
     } catch (error) {
       console.error("expiredBooking failed", error);
     }
-  });
+  }, 60 * 1000);
 
   app
     .listen(PORT, () => {

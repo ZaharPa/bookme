@@ -38,7 +38,7 @@ export async function stats(req: Request, res: Response) {
 
   const from = parsed.data.from.toISOString();
   const to = parsed.data.to.toISOString();
-  console.log(from, to);
+
   const users = await db.orm.public.User.where((u) => u.createdAt.gte(from))
     .where((u) => u.createdAt.lt(to))
     .aggregate((a) => ({ total: a.count() }));

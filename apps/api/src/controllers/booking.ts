@@ -251,6 +251,7 @@ export async function updateBookingStatus(
   const business =
     location &&
     (await db.orm.public.Business.where({ id: location.businessId }).first());
+
   if (!business || business.ownerId !== req.user!.userId)
     return errorResponse(res, 404, "Business not found");
 
@@ -259,7 +260,6 @@ export async function updateBookingStatus(
 
   if (new Date(booking.startTime) > new Date())
     return errorResponse(res, 409, "Booking has not started yet");
-
   const updated = await db.orm.public.Booking.where({
     id: booking.id,
     status: "CONFIRMED",
