@@ -57,6 +57,7 @@ model Business {
   status                  BusinessStatus  @default(PENDING)  
   description             String?
   locations               Location[]
+  photos                  BusinessPhoto[]
   cancellationWindowHours Int             @default(24)
   viewCount               Int             @default(0)
   createdAt               TimestamptzString             @default(now())
@@ -107,4 +108,13 @@ model Booking {
   updatedAt temporal.updatedAtString()
   deletedAt             TimestamptzString?
   @@index([resourceId, startTime])
+}
+
+model BusinessPhoto {
+  id          String            @id @default(uuid())
+  business    Business          @relation(fields: [businessId], references: [id])
+  businessId  String
+  key         String            @unique
+  createdAt   TimestamptzString @default(now())
+  deletedAt   TimestamptzString? 
 }

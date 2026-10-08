@@ -29,6 +29,12 @@ import {
   deleteResource,
 } from "../controllers/business";
 import { viewAvailability } from "../controllers/booking";
+import { PhotoConfirmSchema, PhotoUploadSchema } from "../schemas/photo";
+import {
+  confirmPhoto,
+  createUploadUrl,
+  deletePhoto,
+} from "../controllers/photo";
 
 const router: express.Router = express.Router();
 
@@ -52,6 +58,26 @@ router.post(
   locationCheck,
   validate(ResourceSchema),
   addResource,
+);
+router.post(
+  "/:businessId/photos/upload-url",
+  requireAuth,
+  businessOwner,
+  validate(PhotoUploadSchema),
+  createUploadUrl,
+);
+router.post(
+  "/:businessId/photos",
+  requireAuth,
+  businessOwner,
+  validate(PhotoConfirmSchema),
+  confirmPhoto,
+);
+router.delete(
+  "/:businessId/photos/:photoId",
+  requireAuth,
+  businessOwner,
+  deletePhoto,
 );
 router.get("/", viewAllBusinesses);
 router.get("/mine", requireAuth, viewMyBusiness);

@@ -12,6 +12,8 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1147.0",
+    "@aws-sdk/s3-request-presigner": "^3.1147.0",
     "@prisma/client": "^7.10.0",
     "@prisma/orm-postgres": "8.0.0-rc.11",
     "@stripe/cli": "^1.53.0",

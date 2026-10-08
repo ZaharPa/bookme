@@ -1,0 +1,164 @@
+[
+  {
+    "id": "table.businessPhoto",
+    "label": "Create table \"businessPhoto\"",
+    "summary": "Creates table \"businessPhoto\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "businessPhoto"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"businessPhoto\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"businessPhoto\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"businessPhoto\"",
+        "sql": "CREATE TABLE \"public\".\"businessPhoto\" (\n  \"businessId\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"deletedAt\" timestamptz,\n  \"id\" text NOT NULL,\n  \"key\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"businessPhoto\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"businessPhoto\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.businessPhoto.businessPhoto_key_key",
+    "label": "Add unique constraint on \"businessPhoto\" (key)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "businessPhoto_key_key",
+        "table": "businessPhoto"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"businessPhoto_key_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "businessPhoto_key_key",
+          "public",
+          "\"public\".\"businessPhoto\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"businessPhoto_key_key\"",
+        "sql": "ALTER TABLE \"public\".\"businessPhoto\" ADD CONSTRAINT \"businessPhoto_key_key\" UNIQUE (\"key\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"businessPhoto_key_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "businessPhoto_key_key",
+          "public",
+          "\"public\".\"businessPhoto\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.businessPhoto.businessPhoto_businessId_idx_ae0ed511",
+    "label": "Create index \"businessPhoto_businessId_idx_ae0ed511\" on \"businessPhoto\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "businessPhoto_businessId_idx_ae0ed511",
+        "table": "businessPhoto"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"businessPhoto_businessId_idx_ae0ed511\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"businessPhoto_businessId_idx_ae0ed511\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"businessPhoto_businessId_idx_ae0ed511\"",
+        "sql": "CREATE INDEX \"businessPhoto_businessId_idx_ae0ed511\" ON \"public\".\"businessPhoto\" (\"businessId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"businessPhoto_businessId_idx_ae0ed511\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"businessPhoto_businessId_idx_ae0ed511\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.businessPhoto.businessPhoto_businessId_fkey",
+    "label": "Add foreign key \"businessPhoto_businessId_fkey\" on \"businessPhoto\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "businessPhoto_businessId_fkey",
+        "table": "businessPhoto"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"businessPhoto_businessId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "businessPhoto_businessId_fkey",
+          "public",
+          "\"public\".\"businessPhoto\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"businessPhoto_businessId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"businessPhoto\"\nADD CONSTRAINT \"businessPhoto_businessId_fkey\"\nFOREIGN KEY (\"businessId\")\nREFERENCES \"public\".\"business\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"businessPhoto_businessId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "businessPhoto_businessId_fkey",
+          "public",
+          "\"public\".\"businessPhoto\""
+        ]
+      }
+    ]
+  }
+]

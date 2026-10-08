@@ -10,6 +10,7 @@ import type {
 import { db } from "../prisma/db";
 import { errorResponse, successResponse } from "../utils/response";
 import { initializeRedisClient } from "../redis/client";
+import { publicUrl } from "../utils/s3";
 
 export async function addBusiness(
   req: Request<{}, {}, Business>,
@@ -61,12 +62,20 @@ export async function viewAllBusinesses(req: Request, res: Response) {
           resource.where({ deletedAt: null }),
         ),
     )
+    .include("photos", (photo) => photo.where({ deletedAt: null }))
     .orderBy((b) => b.createdAt.desc())
     .limit(perPage)
     .offset((page - 1) * perPage)
     .all();
 
-  return successResponse(res, 200, businesses);
+  const businessesWithPhotos = businesses.map((business) => ({
+    ...business,
+    photos: business.photos.map((photo) => ({
+      id: photo.id,
+      url: publicUrl(photo.key),
+    })),
+  }));
+  return successResponse(res, 200, businessesWithPhotos);
 }
 
 export async function viewBusiness(
@@ -84,6 +93,7 @@ export async function viewBusiness(
           resource.where({ deletedAt: null }),
         ),
     )
+    .include("photos", (photo) => photo.where({ deletedAt: null }))
     .first();
   if (!business) {
     return errorResponse(res, 404, "Business not found");
@@ -100,7 +110,11 @@ export async function viewBusiness(
     await redis.incr(`business:views:${business.id}`);
   }
 
-  return successResponse(res, 200, business);
+  const photos = business.photos.map((p) => ({
+    id: p.id,
+    url: publicUrl(p.key),
+  }));
+  return successResponse(res, 200, { ...business, photos });
 }
 
 export async function viewMyBusiness(req: Request, res: Response) {
