@@ -1,6 +1,8 @@
 import { Link, Outlet } from "react-router";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Layout() {
+  const { user, isLoading, logout } = useAuth();
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       <header className="border-b bg-white">
@@ -8,6 +10,23 @@ export default function Layout() {
           <Link to="/" className="text-xl font-bold">
             Bookme
           </Link>
+
+          <div className="flex items-center gap-4">
+            {isLoading ? (
+              <span>...</span>
+            ) : user ? (
+              <>
+                <span>{user.name}</span>
+                <button onClick={() => void logout()} className="underline">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link to="/login" className="underline">
+                Login
+              </Link>
+            )}
+          </div>
         </nav>
       </header>
 

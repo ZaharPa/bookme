@@ -22,4 +22,4 @@ export const loginLimiter = createLimiter("login", 5, 15 * 60 * 1000);
 export const registerLimiter = createLimiter("register", 5, 60 * 60 * 1000);
 export const passwordLimiter = createLimiter("password", 5, 60 * 60 * 1000);
 export const refreshLimiter = createLimiter("refresh", 30, 15 * 60 * 1000);
-export const emailLimiter = createLimiter("email", 5, 60 * 60 * 100);
+export const emailLimiter = createLimiter("email", 5, 60 * 60 * 1000);
