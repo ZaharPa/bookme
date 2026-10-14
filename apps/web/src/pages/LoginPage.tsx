@@ -1,34 +1,46 @@
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 import { useAuth } from "../hooks/useAuth";
-import { useState } from "react";
+import { ApiError, fieldError } from "../lib/error";
+import { useForm } from "react-hook-form";
+import { type LoginForm, loginSchema } from "../schemas/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function LoginPage() {
   const { login } = useAuth();
-  const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmiting, setIsSubmiting] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  async function handleSubmit() {
-    setError(null);
-    setIsSubmiting(true);
+  async function onSubmit(values: LoginForm) {
     try {
-      await login(email, password);
-      navigate("/");
+      await login(values.email, values.password);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setIsSubmiting(false);
+      if (err instanceof ApiError) {
+        const emailIssue = fieldError(err.details, "email");
+        const passowordIssue = fieldError(err.details, "password");
+
+        if (emailIssue) setError("email", { message: emailIssue });
+        if (passowordIssue) setError("password", { message: passowordIssue });
+
+        if (!emailIssue && !passowordIssue)
+          setError("root", { message: err.message });
+      } else {
+        setError("root", { message: "Something went wrong" });
+      }
     }
   }
 
   return (
     <form
+      noValidate
       onSubmit={(e) => {
-        e.preventDefault();
-        void handleSubmit();
+        void handleSubmit(onSubmit)(e);
       }}
       className="mx-auto flex max-w-sm flex-col gap-3"
     >
@@ -37,28 +49,34 @@ export default function LoginPage() {
       <input
         type="email"
         placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        {...register("email")}
         className="rounded border p-2"
       />
+      {errors.email && <p className="text-red-600">{errors.email.message}</p>}
 
       <input
         type="password"
         placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        {...register("password")}
         className="rounded border p-2"
       />
+      {errors.password && (
+        <p className="text-red-600">{errors.password.message}</p>
+      )}
 
-      {error && <p className="text-red-600">{error}</p>}
+      {errors.root && <p className="text-red-600">{errors.root.message}</p>}
 
       <button
         type="submit"
-        disabled={isSubmiting}
+        disabled={isSubmitting}
         className="rounded bg-gray-900 p-2 text-white disabled:opacity-50"
       >
-        {isSubmiting ? "Logging in ..." : "Login"}
+        {isSubmitting ? "Logging in ..." : "Login"}
       </button>
+
+      <Link to="/register" className="pt-4 text-sm underline text-gray-500">
+        Don't have an account? Register
+      </Link>
     </form>
   );
 }

@@ -1,4 +1,4 @@
-import { ApiError } from "../config/ApiError";
+import { ApiError } from "./error";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
@@ -21,7 +21,14 @@ async function request(path: string, options?: RequestInit) {
   const body = await response.json();
 
   if (!response.ok) {
-    throw new ApiError(response.status, body.error);
+    const error = body.error;
+    if (Array.isArray(error)) {
+      throw new ApiError(response.status, "Invalid data", error);
+    }
+    throw new ApiError(
+      response.status,
+      typeof error === "string" ? error : "Request failed",
+    );
   }
   return body.data;
 }

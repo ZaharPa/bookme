@@ -20,6 +20,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void load();
   }, []);
 
+  async function registration(name: string, email: string, password: string) {
+    const data = await api.post("/auth/registration", {
+      name,
+      email,
+      password,
+    });
+    setAccessToken(data.accessToken);
+    setUser(await api.get("/users/me"));
+  }
+
   async function login(email: string, password: string) {
     const data = await api.post("/auth/login", { email, password });
     setAccessToken(data.accessToken);
@@ -33,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext value={{ user, isLoading, login, logout }}>
+    <AuthContext value={{ user, isLoading, registration, login, logout }}>
       {children}
     </AuthContext>
   );
