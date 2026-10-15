@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { AuthContext } from "./auth-context";
 import type { User } from "../types/User";
 import { api, refreshSession, setAccessToken } from "../lib/api";
+import type { AccessToken } from "../types/AccessToken";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -21,23 +22,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   async function registration(name: string, email: string, password: string) {
-    const data = await api.post("/auth/registration", {
+    const data = await api.post<AccessToken>("/auth/registration", {
       name,
       email,
       password,
     });
     setAccessToken(data.accessToken);
-    setUser(await api.get("/users/me"));
+    setUser(await api.get<User>("/users/me"));
   }
 
   async function login(email: string, password: string) {
-    const data = await api.post("/auth/login", { email, password });
+    const data = await api.post<AccessToken>("/auth/login", {
+      email,
+      password,
+    });
     setAccessToken(data.accessToken);
-    setUser(await api.get("/users/me"));
+    setUser(await api.get<User>("/users/me"));
   }
 
   async function logout() {
-    await api.post("/auth/logout");
+    await api.post<AccessToken>("/auth/logout");
     setAccessToken(null);
     setUser(null);
   }

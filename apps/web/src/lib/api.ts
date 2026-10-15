@@ -1,3 +1,4 @@
+import type { AccessToken } from "../types/AccessToken";
 import { ApiError } from "./error";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
@@ -8,7 +9,7 @@ export function setAccessToken(token: string | null) {
   accessToken = token;
 }
 
-async function request(path: string, options?: RequestInit) {
+async function request<T>(path: string, options?: RequestInit) {
   const headers = new Headers(options?.headers);
   if (accessToken !== null)
     headers.set("Authorization", `Bearer ${accessToken}`);
@@ -30,20 +31,20 @@ async function request(path: string, options?: RequestInit) {
       typeof error === "string" ? error : "Request failed",
     );
   }
-  return body.data;
+  return body.data as T;
 }
 
 export const api = {
-  get: (path: string) => request(path),
-  delete: (path: string) => request(path, { method: "DELETE" }),
-  post: (path: string, data?: unknown) =>
-    request(path, {
+  get: <T>(path: string) => request<T>(path),
+  delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),
+  post: <T>(path: string, data?: unknown) =>
+    request<T>(path, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     }),
-  patch: (path: string, data?: unknown) =>
-    request(path, {
+  patch: <T>(path: string, data?: unknown) =>
+    request<T>(path, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -52,7 +53,9 @@ export const api = {
 
 async function doRefresh() {
   try {
-    const data = await request("/auth/refresh", { method: "POST" });
+    const data = await request<AccessToken>("/auth/refresh", {
+      method: "POST",
+    });
     setAccessToken(data.accessToken);
     return data.accessToken as string;
   } catch {

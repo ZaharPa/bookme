@@ -49,24 +49,30 @@ export async function addResource(
 
 export async function viewAllBusinesses(req: Request, res: Response) {
   const page = Math.max(1, Math.floor(Number(req.query.page)) || 1);
-  const perPage = 10;
+  const perPage = 2;
 
-  const businesses = await db.orm.public.Business.where({
-    status: "APPROVED",
-    deletedAt: null,
-  })
-    .include("locations", (location) =>
-      location
-        .where({ deletedAt: null })
-        .include("resources", (resource) =>
-          resource.where({ deletedAt: null }),
-        ),
-    )
-    .include("photos", (photo) => photo.where({ deletedAt: null }))
-    .orderBy((b) => b.createdAt.desc())
-    .limit(perPage)
-    .offset((page - 1) * perPage)
-    .all();
+  const [businesses, count] = await Promise.all([
+    db.orm.public.Business.where({
+      status: "APPROVED",
+      deletedAt: null,
+    })
+      .include("locations", (location) =>
+        location
+          .where({ deletedAt: null })
+          .include("resources", (resource) =>
+            resource.where({ deletedAt: null }),
+          ),
+      )
+      .include("photos", (photo) => photo.where({ deletedAt: null }))
+      .orderBy((b) => b.createdAt.desc())
+      .limit(perPage)
+      .offset((page - 1) * perPage)
+      .all(),
+    db.orm.public.Business.where({
+      status: "APPROVED",
+      deletedAt: null,
+    }).aggregate((a) => ({ total: a.count() })),
+  ]);
 
   const businessesWithPhotos = businesses.map((business) => ({
     ...business,
@@ -75,7 +81,13 @@ export async function viewAllBusinesses(req: Request, res: Response) {
       url: publicUrl(photo.key),
     })),
   }));
-  return successResponse(res, 200, businessesWithPhotos);
+  return successResponse(res, 200, {
+    items: businessesWithPhotos,
+    total: count.total,
+    page,
+    perPage,
+    totalPages: Math.ceil(count.total / perPage),
+  });
 }
 
 export async function viewBusiness(
