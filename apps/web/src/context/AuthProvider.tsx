@@ -1,18 +1,28 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { AuthContext } from "./auth-context";
 import type { User } from "../types/User";
-import { api, refreshSession, setAccessToken } from "../lib/api";
+import {
+  api,
+  refreshSession,
+  setAccessToken,
+  setSessionExpiredHandler,
+} from "../lib/api";
 import type { AccessToken } from "../types/AccessToken";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setSessionExpiredHandler(() => setUser(null));
+  }, []);
+
   useEffect(() => {
     async function load() {
       try {
         const token = await refreshSession();
         if (token !== null) {
-          setUser(await api.get("/users/me"));
+          setUser(await api.get<User>("/users/me"));
         }
       } finally {
         setIsLoading(false);
@@ -41,9 +51,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function logout() {
-    await api.post<AccessToken>("/auth/logout");
-    setAccessToken(null);
-    setUser(null);
+    try {
+      await api.post<AccessToken>("/auth/logout");
+    } finally {
+      setAccessToken(null);
+      setUser(null);
+    }
   }
 
   return (

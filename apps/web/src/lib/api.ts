@@ -4,12 +4,20 @@ import { ApiError } from "./error";
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 let accessToken: string | null = null;
+let onSessionExpired: () => void = () => {};
+export function setSessionExpiredHandler(fn: () => void) {
+  onSessionExpired = fn;
+}
 
 export function setAccessToken(token: string | null) {
   accessToken = token;
 }
 
-async function request<T>(path: string, options?: RequestInit) {
+async function request<T>(
+  path: string,
+  options?: RequestInit,
+  retried = false,
+) {
   const headers = new Headers(options?.headers);
   if (accessToken !== null)
     headers.set("Authorization", `Bearer ${accessToken}`);
@@ -19,6 +27,14 @@ async function request<T>(path: string, options?: RequestInit) {
     headers,
     credentials: "include",
   });
+
+  if (response.status === 401 && !retried && !path.startsWith("/auth/")) {
+    const token = await refreshSession();
+    if (token) return request<T>(path, options, true);
+    setAccessToken(null);
+    onSessionExpired();
+  }
+
   const body = await response.json();
 
   if (!response.ok) {
