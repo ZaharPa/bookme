@@ -59,8 +59,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  async function refreshUser() {
+    setUser(await api.get<User>("/users/me"));
+  }
+
   return (
-    <AuthContext value={{ user, isLoading, registration, login, logout }}>
+    <AuthContext
+      value={{ user, isLoading, registration, login, logout, refreshUser }}
+    >
       {children}
     </AuthContext>
   );

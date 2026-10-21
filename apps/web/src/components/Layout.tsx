@@ -1,5 +1,6 @@
 import { Link, Outlet } from "react-router";
 import { useAuth } from "../hooks/useAuth";
+import VerifyEmailBanner from "./VerifyEmailBanner";
 
 export default function Layout() {
   const { user, isLoading, logout } = useAuth();
@@ -31,6 +32,7 @@ export default function Layout() {
       </header>
 
       <main className="mx-auto max-w-5xl p-4">
+        <VerifyEmailBanner />
         <Outlet />
       </main>
     </div>
