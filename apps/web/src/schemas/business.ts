@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const BUSINESS_TYPES = [
+export const BUSINESS_TYPES = [
   "RESTAURANT",
   "BARBERSHOP",
   "COWORKING",
@@ -67,3 +67,7 @@ export const ResourceSchema = z.object({
     .min(0, "Price is required")
     .max(9999999, "Too big price"),
 });
+
+export type Business = z.infer<typeof BusinessSchema>;
+export type Location = z.infer<typeof LocationSchema>;
+export type Resource = z.infer<typeof ResourceSchema>;

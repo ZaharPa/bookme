@@ -1,5 +1,4 @@
 import { useBusinesses } from "../queries/business";
-import type { Business } from "../types/Business";
 import Pagination from "../components/Pagination";
 import { Link, useSearchParams } from "react-router";
 
@@ -27,7 +26,7 @@ export default function HomePage() {
         <p className="mt-4">No businesses yet</p>
       ) : (
         <ul>
-          {data.items.map((business: Business) => (
+          {data.items.map((business) => (
             <li key={business.id}>
               <Link
                 to={`/businesses/${business.id}`}

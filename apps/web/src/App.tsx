@@ -8,6 +8,9 @@ import GuestRoute from "./components/GuestRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import BusinessPage from "./pages/BusinessPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
+import MyBusinessesPage from "./pages/MyBusinessesPage";
+import CreateBusinessPage from "./pages/CreateBusinessPage";
+import UpdateBusinessPage from "./pages/UpdateBusinessPage";
 
 export default function App() {
   return (
@@ -22,7 +25,14 @@ export default function App() {
           <Route path="/register" element={<RegistrationPage />} />
         </Route>
 
-        <Route element={<ProtectedRoute />}></Route>
+        <Route element={<ProtectedRoute />}>
+          <Route path="/businesses/mine" element={<MyBusinessesPage />} />
+          <Route path="/businesses/create" element={<CreateBusinessPage />} />
+          <Route
+            path="/businesses/:businessId/update"
+            element={<UpdateBusinessPage />}
+          />
+        </Route>
 
         <Route path="*" element={<NotFoundPage />} />
       </Route>

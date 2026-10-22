@@ -17,6 +17,14 @@ export default function Layout() {
               <span>...</span>
             ) : user ? (
               <>
+                {(user.role === "ADMIN" || user.role === "BUSINESS_OWNER") && (
+                  <Link
+                    to="/businesses/mine"
+                    className="underline border border-gray-300"
+                  >
+                    My businesses
+                  </Link>
+                )}
                 <span>{user.name}</span>
                 <button onClick={() => void logout()} className="underline">
                   Logout
