@@ -71,3 +71,4 @@ export const ResourceSchema = z.object({
 export type Business = z.infer<typeof BusinessSchema>;
 export type Location = z.infer<typeof LocationSchema>;
 export type Resource = z.infer<typeof ResourceSchema>;
+export type OpeningHours = z.infer<typeof openingHoursSchema>;

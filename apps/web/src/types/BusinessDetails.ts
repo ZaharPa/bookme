@@ -1,3 +1,5 @@
+import type { OpeningHours } from "../schemas/business";
+
 export type BusinessType =
   | "RESTAURANT"
   | "BARBERSHOP"
@@ -20,7 +22,7 @@ export type Location = {
   city: string;
   address: string;
   timezone: string;
-  openingHours: unknown;
+  openingHours: OpeningHours;
   resources: Resource[];
 };
 

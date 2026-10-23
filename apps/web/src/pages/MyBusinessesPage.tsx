@@ -42,34 +42,82 @@ export default function MyBusinessesPage() {
       ) : (
         <ul>
           {data.items.map((business) => (
-            <li
-              key={business.id}
-              className="grid grid-cols-5 gap-2 text-center mt-4"
-            >
+            <li key={business.id} className=" mt-4">
+              <div className="grid grid-cols-5 gap-2 text-center">
+                {" "}
+                <Link
+                  to={`/businesses/${business.id}`}
+                  className="col-span-3 grid grid-cols-3 gap-2 "
+                >
+                  <div>{business.name}</div>
+                  <div>{business.phone}</div>
+                  <div>{business.description}</div>
+                </Link>
+                <Link
+                  to={`/businesses/${business.id}/update`}
+                  className="border border-gray-400 p-2 cursor-pointer"
+                >
+                  Update
+                </Link>
+                <button
+                  onClick={() => {
+                    if (window.confirm("Delete this business?"))
+                      remove(business.id);
+                  }}
+                  disabled={isDeleting}
+                  className="border border-gray-400 p-2 cursor-pointer"
+                >
+                  Delete
+                </button>
+              </div>
+
+              <ul className="ml-6 mt-2">
+                {business.locations.map((location) => (
+                  <li key={location.id} className="mt-2">
+                    <div className="flex gap-2">
+                      <span>
+                        {location.city} {location.country} {location.address}
+                      </span>
+                      <Link
+                        to={`/businesses/${business.id}/locations/${location.id}/update`}
+                        className="border border-gray-400 p-2 cursor-pointer"
+                      >
+                        Update
+                      </Link>
+                    </div>
+
+                    <ul className="ml-6">
+                      {location.resources.map((resource) => (
+                        <li key={resource.id} className="flex gap-2">
+                          <span>
+                            {resource.name}{" "}
+                            {(resource.priceCents / 100).toFixed(2)} $
+                          </span>
+                          <Link
+                            to={`/businesses/${business.id}/locations/${location.id}/resources/${resource.id}/update`}
+                            className="border border-gray-400 p-2 cursor-pointer"
+                          >
+                            Update
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <Link
+                      to={`/businesses/${business.id}/locations/${location.id}/resources/create`}
+                      className="ml-6 mt-1 inline-block border border-gray-400 p-2"
+                    >
+                      Add resource
+                    </Link>
+                  </li>
+                ))}
+              </ul>
               <Link
-                to={`/businesses/${business.id}`}
-                className="col-span-3 grid grid-cols-3 gap-2 "
+                to={`/businesses/${business.id}/locations/create`}
+                className="ml-6 mt-2 inline-block border border-gray-400 p-2"
               >
-                <div>{business.name}</div>
-                <div>{business.phone}</div>
-                <div>{business.description}</div>
+                Add location
               </Link>
-              <Link
-                to={`/businesses/${business.id}/update`}
-                className="border border-gray-400 p-2 cursor-pointer"
-              >
-                Update
-              </Link>
-              <button
-                onClick={() => {
-                  if (window.confirm("Delete this business?"))
-                    remove(business.id);
-                }}
-                disabled={isDeleting}
-                className="border border-gray-400 p-2 cursor-pointer"
-              >
-                Delete
-              </button>
             </li>
           ))}
         </ul>

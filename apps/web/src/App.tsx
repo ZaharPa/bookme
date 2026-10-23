@@ -11,6 +11,10 @@ import VerifyEmailPage from "./pages/VerifyEmailPage";
 import MyBusinessesPage from "./pages/MyBusinessesPage";
 import CreateBusinessPage from "./pages/CreateBusinessPage";
 import UpdateBusinessPage from "./pages/UpdateBusinessPage";
+import CreateLocationPage from "./pages/CreateLocationPage";
+import UpdateLocationPage from "./pages/UpdateLocationPage";
+import CreateResourcePage from "./pages/CreateResourcePage";
+import UpdateResourcePage from "./pages/UpdateResourcePage";
 
 export default function App() {
   return (
@@ -31,6 +35,24 @@ export default function App() {
           <Route
             path="/businesses/:businessId/update"
             element={<UpdateBusinessPage />}
+          />
+
+          <Route
+            path="/businesses/:businessId/locations/create"
+            element={<CreateLocationPage />}
+          />
+          <Route
+            path="/businesses/:businessId/locations/:locationId/update"
+            element={<UpdateLocationPage />}
+          />
+
+          <Route
+            path="/businesses/:businessId/locations/:locationId/resources/create"
+            element={<CreateResourcePage />}
+          />
+          <Route
+            path="/businesses/:businessId/locations/:locationId/resources/:resourceId/update"
+            element={<UpdateResourcePage />}
           />
         </Route>
 

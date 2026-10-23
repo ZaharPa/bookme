@@ -135,7 +135,7 @@ export async function viewMyBusiness(req: Request, res: Response) {
   const perPage = 10;
 
   const [businesses, count] = await Promise.all([
-    db.orm.public.Business.where({ ownerId: userId })
+    db.orm.public.Business.where({ ownerId: userId, deletedAt: null })
       .include("locations", (location) => location.include("resources"))
       .include("photos", (photo) => photo.where({ deletedAt: null }))
       .orderBy((p) => p.createdAt.desc())
