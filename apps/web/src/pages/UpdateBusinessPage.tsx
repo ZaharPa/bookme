@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type Business } from "../schemas/business";
 import { updateBusiness, useBusiness } from "../queries/business";
 import BusinessForm from "../components/BusinessForm";
+import PhotoManager from "../components/PhotoManager";
 
 export default function UpdateBusinessPage() {
   const navigate = useNavigate();
@@ -47,7 +48,8 @@ export default function UpdateBusinessPage() {
         isPending={isPending}
         error={error?.message}
         submitLabel="Update"
-      />{" "}
+      />
+      <PhotoManager businessId={business.id} photos={business.photos} />
     </>
   );
 }
