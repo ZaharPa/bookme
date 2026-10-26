@@ -1,10 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import { useBusiness } from "../queries/business";
-import { createBooking, useAvailability } from "../queries/booking";
+import { createBooking, useAvailability, useBooking } from "../queries/booking";
 import { toMinutes } from "../utils/time";
 import AvailabilityMap from "../components/AvailabilityMap";
+import { Elements } from "@stripe/react-stripe-js";
+import { stripePromise } from "../lib/stripe";
+import PaymentForm from "../components/PaymentForm";
 
 const DAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
 
@@ -28,12 +31,16 @@ export default function BookingPage() {
       queryClient.invalidateQueries({ queryKey: ["availability", resourceId] }),
   });
 
+  const [paid, setPaid] = useState(false);
+  const bookingId = booking.data?.booking.id;
+  const confirmed = useBooking(bookingId ?? "", paid);
+
   if (isPending) return <p>Loading...</p>;
   if (isError) return <p className="text-red-600">{error.message}</p>;
 
   const location = business.locations.find((l) => l.id === locationId);
   const resource = location?.resources.find((r) => r.id === resourceId);
-  if (!location && !resource) return <p>Resource not found</p>;
+  if (!location || !resource) return <p>Resource not found</p>;
 
   const hours = date
     ? location?.openingHours[DAY_KEYS[new Date(`${date}T00:00`).getDay()]]
@@ -53,13 +60,11 @@ export default function BookingPage() {
       <h1 className="text-3xl font-bold">
         {business.name} {resource?.name}{" "}
       </h1>
-
       <input
         type="date"
         value={date}
         onChange={(e) => setDate(e.target.value)}
       />
-
       {date && availability.isPending && <p>Loading...</p>}
       {availability.isError && (
         <p className="text-red-600">{availability.error.message}</p>
@@ -72,7 +77,6 @@ export default function BookingPage() {
           booked={availability.data.booked}
         />
       )}
-
       <div className="mt-4 flex gap-2">
         <input
           type="time"
@@ -87,21 +91,41 @@ export default function BookingPage() {
           onChange={(e) => setTo(e.target.value)}
         />
       </div>
-
       {minutes > 0 && <p>Estimated price : {price}</p>}
-
-      <button
-        onClick={submit}
-        disabled={minutes <= 0 || booking.isPending}
-        className="border p-2 cursor-pointer"
-      >
-        {booking.isPending ? "Booking.." : "Book"}
-      </button>
-
+      {!booking.data && (
+        <button
+          onClick={submit}
+          disabled={minutes <= 0 || booking.isPending}
+          className="border p-2 cursor-pointer"
+        >
+          {booking.isPending ? "Booking.." : "Book"}
+        </button>
+      )}
       {booking.isError && (
         <p className="text-red-600">{booking.error.message}</p>
       )}
-      {booking.isSuccess && <p>Booking created next step payment</p>}
+      {booking.data && !paid && (
+        <Elements
+          stripe={stripePromise}
+          options={{ clientSecret: booking.data.clientSecret }}
+        >
+          <PaymentForm onPaid={() => setPaid(true)} />
+        </Elements>
+      )}
+      {paid && confirmed.data?.status === "PENDING_PAYMENT" && (
+        <p>Waiting for confirmation...</p>
+      )}
+      {confirmed.isError && (
+        <p className="text-red-600">{confirmed.error.message}</p>
+      )}
+      {confirmed.data?.status === "CONFIRMED" && (
+        <div>
+          <p>Booking confirmed</p>
+          <Link to="/" className="underline">
+            Home
+          </Link>
+        </div>
+      )}{" "}
     </div>
   );
 }

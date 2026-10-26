@@ -8,3 +8,17 @@ export type BookingInput = {
   startTime: string;
   endTime: string;
 };
+
+export type BookingDetails = {
+  id: string;
+  status:
+    | "PENDING_PAYMENT"
+    | "CONFIRMED"
+    | "COMPLETED"
+    | "NO_SHOW"
+    | "CANCELLED"
+    | "EXPIRED";
+  startTime: string;
+  endTime: string;
+  totalAmountCents: number;
+};
