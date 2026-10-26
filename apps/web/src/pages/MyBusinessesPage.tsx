@@ -44,7 +44,6 @@ export default function MyBusinessesPage() {
           {data.items.map((business) => (
             <li key={business.id} className=" mt-4">
               <div className="grid grid-cols-5 gap-2 text-center">
-                {" "}
                 <Link
                   to={`/businesses/${business.id}`}
                   className="col-span-3 grid grid-cols-3 gap-2 "
