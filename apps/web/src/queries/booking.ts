@@ -5,6 +5,8 @@ import type {
   Availability,
   BookingInput,
 } from "../types/Booking";
+import { useAuth } from "../hooks/useAuth";
+import type { Paginated } from "../types/Paginated";
 
 export function useAvailability(resourceId: string, date: string) {
   return useQuery({
@@ -36,4 +38,39 @@ export function useBooking(bookingId: string, enabled = true) {
     refetchInterval: (query) =>
       query.state.data?.status === "PENDING_PAYMENT" ? 2000 : false,
   });
+}
+
+export function useMyBookings(page: number) {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ["booking", "mine", user?.id, page],
+    queryFn: () =>
+      api.get<Paginated<BookingDetails>>(`/bookings/mine?page=${page}`),
+    enabled: !!user,
+  });
+}
+
+export function useBusinessBookings(page: number) {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ["booking", "business", "mine", user?.id, page],
+    queryFn: () =>
+      api.get<Paginated<BookingDetails>>(
+        `/bookings/business/mine?page=${page}`,
+      ),
+    enabled: !!user,
+  });
+}
+
+export function cancelBooking(bookingId: string) {
+  return api.patch<BookingDetails>(`/bookings/${bookingId}/cancel`);
+}
+
+export function updateBookingStatus(
+  bookingId: string,
+  status: "COMPLETED" | "NO_SHOW",
+) {
+  return api.patch<BookingDetails>(`/bookings/${bookingId}/status`, { status });
 }

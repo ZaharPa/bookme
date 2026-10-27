@@ -31,6 +31,13 @@ export default function MyBusinessesPage() {
       <p className="mt-2 text-gray-600">Text under</p>
 
       <Link
+        to="/businesses/bookings/mine"
+        className="underline border border-gray-300"
+      >
+        My businesses bookings
+      </Link>
+
+      <Link
         to="/businesses/create"
         className="underline border border-gray-300"
       >

@@ -16,6 +16,9 @@ import UpdateLocationPage from "./pages/UpdateLocationPage";
 import CreateResourcePage from "./pages/CreateResourcePage";
 import UpdateResourcePage from "./pages/UpdateResourcePage";
 import BookingPage from "./pages/BookingPage";
+import MyBookingPage from "./pages/MyBookingPage";
+import BusinessBookingPage from "./pages/BusinessBookingPage";
+import ViewBookingPage from "./pages/ViewBookinPage";
 
 export default function App() {
   return (
@@ -59,6 +62,12 @@ export default function App() {
           <Route
             path="/businesses/:businessId/locations/:locationId/resources/:resourceId/book"
             element={<BookingPage />}
+          />
+          <Route path="/bookings/:bookingId" element={<ViewBookingPage />} />
+          <Route path="/bookings/mine" element={<MyBookingPage />} />
+          <Route
+            path="/businesses/bookings/mine"
+            element={<BusinessBookingPage />}
           />
         </Route>
 

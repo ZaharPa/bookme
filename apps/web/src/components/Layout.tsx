@@ -25,6 +25,12 @@ export default function Layout() {
                     My businesses
                   </Link>
                 )}
+                <Link
+                  to="/bookings/mine"
+                  className="underline border border-gray-300"
+                >
+                  My bookings
+                </Link>
                 <span>{user.name}</span>
                 <button onClick={() => void logout()} className="underline">
                   Logout

@@ -135,14 +135,27 @@ export async function createBooking(
 export async function viewMyBookings(req: Request, res: Response) {
   const page = Math.max(1, Math.floor(Number(req.query.page)) || 1);
   const perPage = 10;
-  const bookings = await db.orm.public.Booking.where({
-    customerId: req.user!.userId,
-  })
-    .orderBy((b) => b.startTime.desc())
-    .limit(perPage)
-    .offset((page - 1) * perPage)
-    .all();
-  return successResponse(res, 200, bookings);
+  const [bookings, count] = await Promise.all([
+    db.orm.public.Booking.where({
+      customerId: req.user!.userId,
+    })
+      .orderBy((b) => b.startTime.desc())
+      .limit(perPage)
+      .offset((page - 1) * perPage)
+      .all(),
+    db.orm.public.Booking.where({ customerId: req.user!.userId }).aggregate(
+      (a) => ({
+        total: a.count(),
+      }),
+    ),
+  ]);
+  return successResponse(res, 200, {
+    items: bookings,
+    total: count.total,
+    page,
+    perPage,
+    totalPages: Math.ceil(count.total / perPage),
+  });
 }
 
 export async function viewBusinessBookings(req: Request, res: Response) {
@@ -161,17 +174,35 @@ export async function viewBusinessBookings(req: Request, res: Response) {
     ),
   );
 
-  if (resourcesId.length === 0) return successResponse(res, 200, []);
+  if (resourcesId.length === 0)
+    return successResponse(res, 200, {
+      items: [],
+      total: 0,
+      page,
+      perPage,
+      totalPages: 0,
+    });
 
-  const bookings = await db.orm.public.Booking.where((b) =>
-    b.resourceId.in(resourcesId),
-  )
-    .orderBy((b) => b.startTime.desc())
-    .limit(perPage)
-    .offset((page - 1) * perPage)
-    .all();
+  const [bookings, count] = await Promise.all([
+    db.orm.public.Booking.where((b) => b.resourceId.in(resourcesId))
+      .orderBy((b) => b.startTime.desc())
+      .limit(perPage)
+      .offset((page - 1) * perPage)
+      .all(),
+    db.orm.public.Booking.where((b) => b.resourceId.in(resourcesId)).aggregate(
+      (a) => ({
+        total: a.count(),
+      }),
+    ),
+  ]);
 
-  return successResponse(res, 200, bookings);
+  return successResponse(res, 200, {
+    items: bookings,
+    total: count.total,
+    page,
+    perPage,
+    totalPages: Math.ceil(count.total / perPage),
+  });
 }
 
 export async function viewBooking(
