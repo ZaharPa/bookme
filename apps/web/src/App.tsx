@@ -19,6 +19,7 @@ import BookingPage from "./pages/BookingPage";
 import MyBookingPage from "./pages/MyBookingPage";
 import BusinessBookingPage from "./pages/BusinessBookingPage";
 import ViewBookingPage from "./pages/ViewBookinPage";
+import AdminRoute from "./components/AdminRoute";
 
 export default function App() {
   return (
@@ -69,6 +70,8 @@ export default function App() {
             path="/businesses/bookings/mine"
             element={<BusinessBookingPage />}
           />
+
+          <Route element={<AdminRoute />}></Route>
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

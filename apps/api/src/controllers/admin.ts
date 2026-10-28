@@ -3,30 +3,56 @@ import { db } from "../prisma/db";
 import { errorResponse, successResponse } from "../utils/response";
 import { StatsQuerySchema, type BusinessStatus } from "../schemas/admin";
 
+const BUSINESS_STATUSES = ["PENDING", "APPROVED", "REJECTED"] as const;
+
 export async function allBusinesses(req: Request, res: Response) {
   const page = Math.max(1, Math.floor(Number(req.query.page)) || 1);
   const perPage = 10;
 
-  const businesses = await db.orm.public.Business.orderBy((b) =>
-    b.createdAt.desc(),
-  )
-    .limit(perPage)
-    .offset((page - 1) * perPage)
-    .all();
+  const status = BUSINESS_STATUSES.find((s) => s === req.query.status);
+  const filter = status ? { status } : {};
 
-  return successResponse(res, 200, businesses);
+  const [businesses, count] = await Promise.all([
+    db.orm.public.Business.where(filter)
+      .orderBy((b) => b.createdAt.desc())
+      .limit(perPage)
+      .offset((page - 1) * perPage)
+      .all(),
+    db.orm.public.Business.where(filter).aggregate((a) => ({
+      total: a.count(),
+    })),
+  ]);
+
+  return successResponse(res, 200, {
+    items: businesses,
+    total: count.total,
+    page,
+    perPage,
+    totalPages: Math.ceil(count.total / perPage),
+  });
 }
 
 export async function allUsers(req: Request, res: Response) {
   const page = Math.max(1, Math.floor(Number(req.query.page)) || 1);
   const perPage = 20;
-  const users = await db.orm.public.User.orderBy((b) => b.createdAt.desc())
-    .limit(perPage)
-    .offset((page - 1) * perPage)
-    .all();
+
+  const [users, count] = await Promise.all([
+    db.orm.public.User.orderBy((b) => b.createdAt.desc())
+      .limit(perPage)
+      .offset((page - 1) * perPage)
+      .all(),
+    db.orm.public.User.aggregate((a) => ({ total: a.count() })),
+  ]);
+
   const resUsers = users.map(({ password, ...rest }) => rest);
 
-  return successResponse(res, 200, resUsers);
+  return successResponse(res, 200, {
+    items: resUsers,
+    total: count.total,
+    page,
+    perPage,
+    totalPages: Math.ceil(count.total / perPage),
+  });
 }
 
 export async function stats(req: Request, res: Response) {
