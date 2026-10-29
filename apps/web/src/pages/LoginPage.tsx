@@ -45,7 +45,6 @@ export default function LoginPage() {
       className="mx-auto flex max-w-sm flex-col gap-3"
     >
       <h1 className="text-2xl font-bold">Login</h1>
-
       <input
         type="email"
         placeholder="Email"
@@ -53,7 +52,6 @@ export default function LoginPage() {
         className="rounded border p-2"
       />
       {errors.email && <p className="text-red-600">{errors.email.message}</p>}
-
       <input
         type="password"
         placeholder="Password"
@@ -63,9 +61,7 @@ export default function LoginPage() {
       {errors.password && (
         <p className="text-red-600">{errors.password.message}</p>
       )}
-
       {errors.root && <p className="text-red-600">{errors.root.message}</p>}
-
       <button
         type="submit"
         disabled={isSubmitting}
@@ -73,9 +69,15 @@ export default function LoginPage() {
       >
         {isSubmitting ? "Logging in ..." : "Login"}
       </button>
-
       <Link to="/register" className="pt-4 text-sm underline text-gray-500">
         Don't have an account? Register
+      </Link>
+
+      <Link
+        to="/forget-password"
+        className="pt-4 text-sm underline text-gray-500"
+      >
+        Forget Password
       </Link>
     </form>
   );

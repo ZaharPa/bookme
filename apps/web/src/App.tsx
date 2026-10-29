@@ -20,6 +20,12 @@ import MyBookingPage from "./pages/MyBookingPage";
 import BusinessBookingPage from "./pages/BusinessBookingPage";
 import ViewBookingPage from "./pages/ViewBookinPage";
 import AdminRoute from "./components/AdminRoute";
+import AdminBusinessesPage from "./pages/AdminBusinessesPage";
+import AdminUsersPage from "./pages/AdminUsersPage";
+import AdminStatsPage from "./pages/AdminStatsPage";
+import ProfilePage from "./pages/ProfilePage";
+import ForgetPasswordPage from "./pages/ForgetPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 export default function App() {
   return (
@@ -27,7 +33,10 @@ export default function App() {
       <Route element={<Layout />}>
         <Route index element={<HomePage />} />
         <Route path="/businesses/:businessId" element={<BusinessPage />} />
+
         <Route path="/verify-email" element={<VerifyEmailPage />} />
+        <Route path="/forget-password" element={<ForgetPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         <Route element={<GuestRoute />}>
           <Route path="/login" element={<LoginPage />} />
@@ -71,7 +80,13 @@ export default function App() {
             element={<BusinessBookingPage />}
           />
 
-          <Route element={<AdminRoute />}></Route>
+          <Route path="/profile" element={<ProfilePage />} />
+
+          <Route element={<AdminRoute />}>
+            <Route path="/admin/businesses" element={<AdminBusinessesPage />} />
+            <Route path="/admin/users" element={<AdminUsersPage />} />
+            <Route path="/admin/stats" element={<AdminStatsPage />} />
+          </Route>
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

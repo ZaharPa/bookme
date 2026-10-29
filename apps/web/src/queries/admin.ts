@@ -14,7 +14,7 @@ export function useAdminBusinesses(page: number, status: string) {
     queryFn: () => {
       const params = new URLSearchParams({ page: String(page) });
       if (status) params.set("status", status);
-      return api.get<Paginated<AdminBusinesses>>(`/admin/businesses/${params}`);
+      return api.get<Paginated<AdminBusinesses>>(`/admin/businesses?${params}`);
     },
     placeholderData: keepPreviousData,
   });

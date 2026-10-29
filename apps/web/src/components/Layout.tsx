@@ -1,6 +1,5 @@
 import { Link, Outlet } from "react-router";
 import { useAuth } from "../hooks/useAuth";
-import VerifyEmailBanner from "./VerifyEmailBanner";
 
 export default function Layout() {
   const { user, isLoading, logout } = useAuth();
@@ -17,21 +16,51 @@ export default function Layout() {
               <span>...</span>
             ) : user ? (
               <>
-                {(user.role === "ADMIN" || user.role === "BUSINESS_OWNER") && (
-                  <Link
-                    to="/businesses/mine"
-                    className="underline border border-gray-300"
-                  >
-                    My businesses
-                  </Link>
-                )}
+                {user.role === "ADMIN" ||
+                  (user.role === "BUSINESS_OWNER" && (
+                    <Link
+                      to="/businesses/mine"
+                      className="underline border border-gray-300"
+                    >
+                      Business Bookings
+                    </Link>
+                  ))}
                 <Link
                   to="/bookings/mine"
                   className="underline border border-gray-300"
                 >
                   My bookings
                 </Link>
-                <span>{user.name}</span>
+
+                {user.role === "ADMIN" && (
+                  <>
+                    <Link
+                      to="/admin/businesses"
+                      className="underline border border-gray-300"
+                    >
+                      Admin businesses
+                    </Link>
+                    <Link
+                      to="/admin/users"
+                      className="underline border border-gray-300"
+                    >
+                      Admin users
+                    </Link>{" "}
+                    <Link
+                      to="/admin/stats"
+                      className="underline border border-gray-300"
+                    >
+                      Admin stats
+                    </Link>
+                  </>
+                )}
+                <Link
+                  to="/businesses/mine"
+                  className="underline border border-gray-300"
+                >
+                  My businesses
+                </Link>
+                <Link to="/profile">{user.name}</Link>
                 <button onClick={() => void logout()} className="underline">
                   Logout
                 </button>
@@ -46,7 +75,6 @@ export default function Layout() {
       </header>
 
       <main className="mx-auto max-w-5xl p-4">
-        <VerifyEmailBanner />
         <Outlet />
       </main>
     </div>
