@@ -1,8 +1,12 @@
-import { Link, Outlet } from "react-router";
+import { Link, Outlet, useLocation } from "react-router";
 import { useAuth } from "../hooks/useAuth";
+import { ErrorBoundary } from "react-error-boundary";
+import { Toaster } from "sonner";
 
 export default function Layout() {
   const { user, isLoading, logout } = useAuth();
+  const location = useLocation();
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       <header className="border-b bg-white">
@@ -75,8 +79,25 @@ export default function Layout() {
       </header>
 
       <main className="mx-auto max-w-5xl p-4">
-        <Outlet />
+        <ErrorBoundary
+          resetKeys={[location.pathname]}
+          fallbackRender={({ error, resetErrorBoundary }) => (
+            <div role="alert">
+              <p>Something went wrong</p>
+              <pre>
+                {error instanceof Error ? error.message : "Unknown error"}
+              </pre>
+              <button onClick={resetErrorBoundary} className="border p-2">
+                Try again
+              </button>
+            </div>
+          )}
+        >
+          <Outlet />
+        </ErrorBoundary>
       </main>
+
+      <Toaster richColors />
     </div>
   );
 }
