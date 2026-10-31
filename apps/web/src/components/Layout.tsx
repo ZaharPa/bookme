@@ -1,93 +1,57 @@
-import { Link, Outlet, useLocation } from "react-router";
+import { Link, NavLink, Outlet, useLocation } from "react-router";
 import { useAuth } from "../hooks/useAuth";
 import { ErrorBoundary } from "react-error-boundary";
 import { Toaster } from "sonner";
 
+const navLink = ({ isActive }: { isActive: boolean }) =>
+  `py-3 ${isActive ? "text-ink" : "text-muted hover:text-ink"}`;
+
 export default function Layout() {
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading } = useAuth();
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      <header className="border-b bg-white">
-        <nav className="mx-auto flex max-w-5xl items-center justify-between p-4">
-          <Link to="/" className="text-xl font-bold">
-            Bookme
-          </Link>
+    <div className="min-h-screen">
+      <header className="border-b border-line bg-white">
+        <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
+          <div className="flex items-center gap-8">
+            <Link to="/" className="link">
+              Bookme
+            </Link>
+            <NavLink to="/places" className={navLink}>
+              Places
+            </NavLink>
+          </div>
 
-          <div className="flex items-center gap-4">
-            {isLoading ? (
-              <span>...</span>
-            ) : user ? (
-              <>
-                {user.role === "ADMIN" ||
-                  (user.role === "BUSINESS_OWNER" && (
-                    <Link
-                      to="/businesses/mine"
-                      className="underline border border-gray-300"
-                    >
-                      Business Bookings
-                    </Link>
-                  ))}
-                <Link
-                  to="/bookings/mine"
-                  className="underline border border-gray-300"
-                >
-                  My bookings
-                </Link>
-
-                {user.role === "ADMIN" && (
-                  <>
-                    <Link
-                      to="/admin/businesses"
-                      className="underline border border-gray-300"
-                    >
-                      Admin businesses
-                    </Link>
-                    <Link
-                      to="/admin/users"
-                      className="underline border border-gray-300"
-                    >
-                      Admin users
-                    </Link>{" "}
-                    <Link
-                      to="/admin/stats"
-                      className="underline border border-gray-300"
-                    >
-                      Admin stats
-                    </Link>
-                  </>
-                )}
-                <Link
-                  to="/businesses/mine"
-                  className="underline border border-gray-300"
-                >
-                  My businesses
-                </Link>
-                <Link to="/profile">{user.name}</Link>
-                <button onClick={() => void logout()} className="underline">
-                  Logout
-                </button>
-              </>
-            ) : (
-              <Link to="/login" className="underline">
+          {isLoading ? (
+            <span>...</span>
+          ) : user ? (
+            <Link to="/bookings/mine" className="link">
+              {user.name}
+            </Link>
+          ) : (
+            <div>
+              <Link to="/login" className="link">
                 Login
               </Link>
-            )}
-          </div>
+              <Link to="/rester" className="link">
+                Sing up
+              </Link>
+            </div>
+          )}
         </nav>
       </header>
 
-      <main className="mx-auto max-w-5xl p-4">
+      <main className="mx-auto max-w-5xl px-4 py-10">
         <ErrorBoundary
           resetKeys={[location.pathname]}
           fallbackRender={({ error, resetErrorBoundary }) => (
             <div role="alert">
-              <p>Something went wrong</p>
-              <pre>
+              <p className="font-semibold">Something went wrong</p>
+              <pre className="mt-2 text-sm text-muted">
                 {error instanceof Error ? error.message : "Unknown error"}
               </pre>
-              <button onClick={resetErrorBoundary} className="border p-2">
+              <button onClick={resetErrorBoundary} className="btn">
                 Try again
               </button>
             </div>

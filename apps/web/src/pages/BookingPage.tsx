@@ -75,6 +75,8 @@ export default function BookingPage() {
           hours={hours ?? null}
           capacity={availability.data.capacity}
           booked={availability.data.booked}
+          from={from}
+          to={to}
         />
       )}
       <div className="mt-4 flex gap-2">

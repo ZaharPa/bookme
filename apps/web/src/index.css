@@ -1,1 +1,63 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --color-ink: #1c2430;
+  --color-muted: #566724;
+  --color-line: #d9dee5;
+  --color-page: #f4f5f7;
+  --color-mark: #f5c842;
+  --color-busy: #c2493d;
+  --color-busy-soft: #e8c9c5;
+}
+
+@layer base {
+  body {
+    @apply bg-page text-ink antialiased;
+  }
+  h1 {
+    @apply text-3xl font-semibold;
+  }
+  h2 {
+    @apply text-xl font-semibold;
+  }
+  button:not(:disabled) {
+    @apply cursor-pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  select,
+  textarea {
+    @apply rounded-sm border border-line bg-white px-3 py-2.5;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-sm bg-ink px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-sm border border-line bg-white px-4 py-3 text-sm text-ink font-semibold disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-danger {
+    @apply inline-flex items-center justify-center rounded-sm border border-busy bg-white px-4 py-3 text-sm text-busy font-semibold disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .link {
+    @apply underline underline-offset-2 hover:text-muted;
+  }
+  .muted {
+    @apply text-sm text-muted;
+  }
+  .field-error {
+    @apply mt-1 text-busy;
+  }
+  .sheet {
+    @apply border-y border-line bg-white;
+  }
+  .sheet-row {
+    @apply border-t border-line px-6 py-4 first:border-t-0;
+  }
+}

@@ -26,6 +26,7 @@ import AdminStatsPage from "./pages/AdminStatsPage";
 import ProfilePage from "./pages/ProfilePage";
 import ForgetPasswordPage from "./pages/ForgetPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import AccountLayout from "./components/AccountLayout";
 
 export default function App() {
   return (
@@ -44,48 +45,53 @@ export default function App() {
         </Route>
 
         <Route element={<ProtectedRoute />}>
-          <Route path="/businesses/mine" element={<MyBusinessesPage />} />
-          <Route path="/businesses/create" element={<CreateBusinessPage />} />
-          <Route
-            path="/businesses/:businessId/update"
-            element={<UpdateBusinessPage />}
-          />
+          <Route element={<AccountLayout />}>
+            <Route path="/businesses/mine" element={<MyBusinessesPage />} />
+            <Route path="/businesses/create" element={<CreateBusinessPage />} />
+            <Route
+              path="/businesses/:businessId/update"
+              element={<UpdateBusinessPage />}
+            />
 
-          <Route
-            path="/businesses/:businessId/locations/create"
-            element={<CreateLocationPage />}
-          />
-          <Route
-            path="/businesses/:businessId/locations/:locationId/update"
-            element={<UpdateLocationPage />}
-          />
+            <Route
+              path="/businesses/:businessId/locations/create"
+              element={<CreateLocationPage />}
+            />
+            <Route
+              path="/businesses/:businessId/locations/:locationId/update"
+              element={<UpdateLocationPage />}
+            />
 
-          <Route
-            path="/businesses/:businessId/locations/:locationId/resources/create"
-            element={<CreateResourcePage />}
-          />
-          <Route
-            path="/businesses/:businessId/locations/:locationId/resources/:resourceId/update"
-            element={<UpdateResourcePage />}
-          />
+            <Route
+              path="/businesses/:businessId/locations/:locationId/resources/create"
+              element={<CreateResourcePage />}
+            />
+            <Route
+              path="/businesses/:businessId/locations/:locationId/resources/:resourceId/update"
+              element={<UpdateResourcePage />}
+            />
 
-          <Route
-            path="/businesses/:businessId/locations/:locationId/resources/:resourceId/book"
-            element={<BookingPage />}
-          />
-          <Route path="/bookings/:bookingId" element={<ViewBookingPage />} />
-          <Route path="/bookings/mine" element={<MyBookingPage />} />
-          <Route
-            path="/businesses/bookings/mine"
-            element={<BusinessBookingPage />}
-          />
+            <Route
+              path="/businesses/:businessId/locations/:locationId/resources/:resourceId/book"
+              element={<BookingPage />}
+            />
+            <Route path="/bookings/:bookingId" element={<ViewBookingPage />} />
+            <Route path="/bookings/mine" element={<MyBookingPage />} />
+            <Route
+              path="/businesses/bookings/mine"
+              element={<BusinessBookingPage />}
+            />
 
-          <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile" element={<ProfilePage />} />
 
-          <Route element={<AdminRoute />}>
-            <Route path="/admin/businesses" element={<AdminBusinessesPage />} />
-            <Route path="/admin/users" element={<AdminUsersPage />} />
-            <Route path="/admin/stats" element={<AdminStatsPage />} />
+            <Route element={<AdminRoute />}>
+              <Route
+                path="/admin/businesses"
+                element={<AdminBusinessesPage />}
+              />
+              <Route path="/admin/users" element={<AdminUsersPage />} />
+              <Route path="/admin/stats" element={<AdminStatsPage />} />
+            </Route>
           </Route>
         </Route>
 

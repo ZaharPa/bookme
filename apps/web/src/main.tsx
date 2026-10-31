@@ -10,6 +10,8 @@ import { BrowserRouter } from "react-router";
 import "./index.css";
 import { AuthProvider } from "./context/AuthProvider.tsx";
 import { toast } from "sonner";
+import "@fontsource/ibm-plex-sans/400.css";
+import "@fontsource/ibm-plex-sans/600.css";
 
 const queryClient = new QueryClient({
   mutationCache: new MutationCache({
