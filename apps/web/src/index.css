@@ -51,8 +51,17 @@
   .muted {
     @apply text-sm text-muted;
   }
+  .field :is(input, select, textarea) {
+    width: 100%;
+  }
   .field-error {
     @apply mt-1 text-busy;
+  }
+  .label {
+    @apply mb-1 block text-sm font-semibold;
+  }
+  .page-box {
+    @apply min-w-11 px-3 py-2.5 text-center text-sm tabular-nums;
   }
   .sheet {
     @apply border-y border-line bg-white;

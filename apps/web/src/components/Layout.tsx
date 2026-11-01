@@ -15,8 +15,8 @@ export default function Layout() {
       <header className="border-b border-line bg-white">
         <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
           <div className="flex items-center gap-8">
-            <Link to="/" className="link">
-              Bookme
+            <Link to="/" className="text-xl font-semibold">
+              BookMe
             </Link>
             <NavLink to="/places" className={navLink}>
               Places
@@ -26,16 +26,16 @@ export default function Layout() {
           {isLoading ? (
             <span>...</span>
           ) : user ? (
-            <Link to="/bookings/mine" className="link">
+            <Link to="/bookings/mine" className="py-3 hover:underline">
               {user.name}
             </Link>
           ) : (
-            <div>
-              <Link to="/login" className="link">
+            <div className="flex items-center gap-5">
+              <Link to="/login" className="py-3 text-muted hover:text-ink">
                 Login
               </Link>
-              <Link to="/rester" className="link">
-                Sing up
+              <Link to="/register" className="btn">
+                Sign up
               </Link>
             </div>
           )}

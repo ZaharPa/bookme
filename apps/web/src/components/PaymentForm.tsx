@@ -34,12 +34,12 @@ export default function PaymentForm({ onPaid }: { onPaid: () => void }) {
   return (
     <form onSubmit={handleSubmit} className="mt-4">
       <PaymentElement />
-      {error && <p className="text-red-600">{error}</p>}
-      <button
-        type="submit"
-        disabled={!stripe || isPending}
-        className="mt-2 border p-2"
-      >
+      {error && (
+        <p className="field-error" role="alert">
+          {error}
+        </p>
+      )}
+      <button type="submit" disabled={!stripe || isPending} className="btn">
         {isPending ? "Paying..." : "Pay"}
       </button>
     </form>

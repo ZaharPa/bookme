@@ -5,6 +5,7 @@ import {
   type Business,
 } from "../schemas/business";
 import { useForm } from "react-hook-form";
+import Field from "./Field";
 
 type Props = {
   defaultValues?: Business;
@@ -13,6 +14,8 @@ type Props = {
   error?: string;
   submitLabel: string;
 };
+
+const typeLabel = (type: string) => type[0] + type.slice(1).toLowerCase();
 
 export default function BusinessForm({
   defaultValues,
@@ -31,77 +34,73 @@ export default function BusinessForm({
   });
   return (
     <div>
-      <h1 className="text-3xl font-bold">{submitLabel}</h1>
+      <h1>{submitLabel} business</h1>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-4 space-y-3">
-        <div>
-          <input placeholder="Name" {...register("name")} />
-          {errors.name && <p className="text-red-600">{errors.name.message}</p>}
-        </div>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="mt-6 max-w-lg space-y-5"
+      >
+        <Field label="Name" error={errors.name?.message ?? ""}>
+          <input {...register("name")} />
+        </Field>
 
-        <div>
-          <input placeholder="Email" {...register("email")} />
-          {errors.email && (
-            <p className="text-red-600">{errors.email.message}</p>
-          )}
-        </div>
+        <Field label="Email" error={errors.email?.message ?? ""}>
+          <input {...register("email")} />
+        </Field>
 
-        <div>
+        <Field
+          label="Phone (optional)"
+          hint="With country code, for example +380991234567"
+          error={errors.phone?.message ?? ""}
+        >
           <input
-            placeholder="Phone (optional)"
+            type="tel"
             {...register("phone", {
               setValueAs: (v: string) => v || undefined,
             })}
           />
-          {errors.phone && (
-            <p className="text-red-600">{errors.phone.message}</p>
-          )}
-        </div>
+        </Field>
 
-        <div>
+        <Field label="Type" error={errors.type?.message ?? ""}>
           <select {...register("type")}>
             {BUSINESS_TYPES.map((type) => (
               <option key={type} value={type}>
-                {type}
+                {typeLabel(type)}
               </option>
             ))}
           </select>
-          {errors.type && <p className="text-red-600">{errors.type.message}</p>}
-        </div>
+        </Field>
 
-        <div>
-          <textarea
-            placeholder="Description (optional)"
+        <Field
+          label="Description (optional)"
+          error={errors.description?.message ?? ""}
+        >
+          <input
             {...register("description", {
               setValueAs: (v: string) => v || undefined,
             })}
           />
-          {errors.description && (
-            <p className="text-red-600">{errors.description.message}</p>
-          )}
-        </div>
+        </Field>
 
-        <div>
+        <Field
+          label="Cancellation window (hours)"
+          hint="Guests can cancel a confirmed booking up to this many hours before it starts."
+          error={errors.cancellationWindowHours?.message ?? ""}
+        >
           <input
-            type="number"
             {...register("cancellationWindowHours", {
               valueAsNumber: true,
             })}
           />
-          {errors.cancellationWindowHours && (
-            <p className="text-red-600">
-              {errors.cancellationWindowHours.message}
-            </p>
-          )}
-        </div>
+        </Field>
 
-        {error && <p className="text-red-600">{error}</p>}
+        {error && (
+          <p className="field-error" role="alert">
+            {error}
+          </p>
+        )}
 
-        <button
-          type="submit"
-          disabled={isPending}
-          className="mt-2 border p-2 bg-white text-blue-800 cursor-pointer"
-        >
+        <button type="submit" disabled={isPending} className="btn">
           {isPending ? "Saving..." : submitLabel}
         </button>
       </form>

@@ -45,7 +45,7 @@ export default function AccountLayout() {
             </NavLink>
           ))}
         </nav>
-        <button onClick={() => void logout} className="btn-secondary">
+        <button onClick={() => void logout()} className="btn-secondary">
           Log out
         </button>
       </div>

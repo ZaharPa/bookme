@@ -1,6 +1,7 @@
 import { useForm, useWatch } from "react-hook-form";
 import { LocationSchema, type Location } from "../schemas/business";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Field from "./Field";
 
 const DAYS = [
   ["mon", "Monday"],
@@ -57,85 +58,89 @@ export default function LocationForm({
 
   return (
     <div>
-      <h1 className="text-3xl font-bold">{submitLabel} location</h1>
+      <h1>{submitLabel} location</h1>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-4 space-y-3">
-        <div>
-          <input placeholder="Country" {...register("country")} />
-          {errors.country && (
-            <p className="text-red-600">{errors.country.message}</p>
-          )}
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="mt-6 max-w-lg space-y-5"
+      >
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Country" error={errors.country?.message ?? ""}>
+            <input {...register("country")} />
+          </Field>
+          <Field label="City" error={errors.city?.message ?? ""}>
+            <input {...register("city")} />
+          </Field>
         </div>
 
-        <div>
-          <input placeholder="City" {...register("city")} />
-          {errors.city && <p className="text-red-600">{errors.city.message}</p>}
-        </div>
+        <Field label="Address" error={errors.address?.message ?? ""}>
+          <input {...register("address")} />
+        </Field>
 
-        <div>
-          <input placeholder="Address" {...register("address")} />
-          {errors.address && (
-            <p className="text-red-600">{errors.address.message}</p>
-          )}
-        </div>
-
-        <div>
-          <input placeholder="Timezone" {...register("timezone")} />
-          {errors.timezone && (
-            <p className="text-red-600">{errors.timezone.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          {DAYS.map(([day, label]) => {
-            const hours = openingHours[day];
-            return (
-              <div key={day} className="flex items-center gap-2">
-                <label className="w-32 flex gap-1">
-                  <input
-                    type="checkbox"
-                    checked={!!hours}
-                    onChange={(e) =>
-                      setValue(
-                        `openingHours.${day}`,
-                        e.target.checked ? WORK_DAY : null,
-                        { shouldValidate: true },
-                      )
-                    }
-                  />
-                  |{label}
-                </label>
-                {hours ? (
-                  <>
-                    <input
-                      type="time"
-                      {...register(`openingHours.${day}.open`)}
-                    />
-                    <input
-                      type="time"
-                      {...register(`openingHours.${day}.close`)}
-                    />
-                  </>
-                ) : (
-                  <span className="text-gray-500">Closed</span>
-                )}
-                {errors.openingHours?.[day]?.message && (
-                  <p className="text-red-600">
-                    {errors.openingHours?.[day]?.message}
-                  </p>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {error && <p className="text-red-600">{error}</p>}
-
-        <button
-          type="submit"
-          disabled={isPending}
-          className="mt-2 border p-2 bg-white text-blue-800 cursor-pointer"
+        <Field
+          label="Timezone"
+          hint="For example Europe/Kyiv. Opening hours use this time zone"
+          error={errors.timezone?.message ?? ""}
         >
+          <input {...register("timezone")} />
+        </Field>
+
+        <fieldset>
+          <legend className="label">Opening hours</legend>
+          <div className="sheet">
+            {DAYS.map(([day, label]) => {
+              const hours = openingHours[day];
+              return (
+                <div
+                  key={day}
+                  className="sheet-row flex flex-wrap items-center gap-3 py-3"
+                >
+                  <label className="w-36 flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      className="size-4 accent-ink"
+                      checked={!!hours}
+                      onChange={(e) =>
+                        setValue(
+                          `openingHours.${day}`,
+                          e.target.checked ? WORK_DAY : null,
+                          { shouldValidate: true },
+                        )
+                      }
+                    />
+                    {label}
+                  </label>
+                  {hours ? (
+                    <>
+                      <input
+                        type="time"
+                        aria-label={`${label} opens`}
+                        {...register(`openingHours.${day}.open`)}
+                      />
+                      <span className="text-muted">to</span>
+                      <input
+                        type="time"
+                        aria-label={`${label} closes`}
+                        {...register(`openingHours.${day}.close`)}
+                      />
+                    </>
+                  ) : (
+                    <span className="text-muted">Closed</span>
+                  )}
+                  {errors.openingHours?.[day]?.message && (
+                    <p className="field-error w-full">
+                      {errors.openingHours?.[day]?.message}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </fieldset>
+
+        {error && <p className="field-error">{error}</p>}
+
+        <button type="submit" disabled={isPending} className="btn">
           {isPending ? "Saving..." : submitLabel}
         </button>
       </form>

@@ -14,32 +14,37 @@ export default function Pagination({
   return (
     <nav
       aria-label="Pagination"
-      className="mt-6 flex items-center justify-center gap-4"
+      className="mt-8 flex flex-wrap items-center gap-2"
     >
       <button
         type="button"
         disabled={Boolean(page <= 1 || isLoading)}
         onClick={() => onPageChange(page - 1)}
-        className="px-3 py-1 disabled:opacity-40"
+        className="btn-secondary"
       >
         Previous
       </button>
 
       {items.map((item, index) =>
         item === "..." ? (
-          <span key={`dots-${index}`} className="px-2">
+          <span key={`dots-${index}`} className="px-1 text-muted">
             ...
+          </span>
+        ) : item === page ? (
+          <span
+            key={item}
+            aria-current="page"
+            className="page-box rounded-sm bg-ink font-semibold text-white"
+          >
+            {item}
           </span>
         ) : (
           <button
             key={item}
             type="button"
-            disabled={item === page || isLoading}
-            aria-current={item === page ? "page" : undefined}
+            disabled={isLoading}
             onClick={() => onPageChange(item)}
-            className={`rounded px-3 py-1 ${
-              item === page ? "bg-gray-900 text-white" : "border"
-            }`}
+            className="page-box rounded-sm border border-line bg-white hover:border-ink disabled:opacity-50"
           >
             {item}
           </button>
@@ -50,7 +55,7 @@ export default function Pagination({
         type="button"
         disabled={Boolean(page >= totalPages || isLoading)}
         onClick={() => onPageChange(page + 1)}
-        className="px-3 py-1 disabled:opacity-40"
+        className="btn-secondary"
       >
         Next
       </button>

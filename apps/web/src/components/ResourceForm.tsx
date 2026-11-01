@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ResourceSchema, type Resource } from "../schemas/business";
 import { useForm } from "react-hook-form";
+import Field from "./Field";
 
 type Props = {
   defaultValues?: Resource;
@@ -28,43 +29,49 @@ export default function ResourceForm({
 
   return (
     <div>
-      <h1 className="text-3xl font-bold">{submitLabel} resource</h1>
+      <h1>{submitLabel} resource</h1>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-4 space-y-3">
-        <div>
-          <input placeholder="Name" {...register("name")} />
-          {errors.name && <p className="text-red-600">{errors.name.message}</p>}
-        </div>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="mt-6 max-w-lg space-y-5"
+      >
+        <Field
+          label="Name"
+          hint="What guests book: a court, a desk, a chair"
+          error={errors.name?.message ?? ""}
+        >
+          <input {...register("name")} />
+        </Field>
 
-        <div>
+        <Field
+          label="Price per hour (cents)"
+          hint="2500 means 25.00 $"
+          error={errors.priceCents?.message ?? ""}
+        >
           <input
             type="number"
-            placeholder="Price in cents"
             {...register("priceCents", { valueAsNumber: true })}
           />
-          {errors.priceCents && (
-            <p className="text-red-600">{errors.priceCents.message}</p>
-          )}
-        </div>
+        </Field>
 
-        <div>
+        <Field
+          label="Capacity"
+          hint="How many bookings can overlap in time. Use 1 for a chair, room or table."
+          error={errors.capacity?.message ?? ""}
+        >
           <input
             type="number"
-            placeholder="Capacity"
             {...register("capacity", { valueAsNumber: true })}
           />
-          {errors.capacity && (
-            <p className="text-red-600">{errors.capacity.message}</p>
-          )}
-        </div>
+        </Field>
 
-        {error && <p className="text-red-600">{error}</p>}
+        {error && (
+          <p className="field-error" role="alert">
+            {error}
+          </p>
+        )}
 
-        <button
-          type="submit"
-          disabled={isPending}
-          className="mt-2 border p-2 bg-white text-blue-800 cursor-pointer"
-        >
+        <button type="submit" disabled={isPending} className="btn">
           {isPending ? "Saving..." : submitLabel}
         </button>
       </form>
