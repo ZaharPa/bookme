@@ -3,10 +3,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type Location } from "../schemas/business";
 import {
   deleteLocation,
+  invalidateBusiness,
   updateLocation,
   useBusiness,
 } from "../queries/business";
 import LocationForm from "../components/LocationForm";
+import { toast } from "sonner";
 
 export default function UpdateLocationPage() {
   const navigate = useNavigate();
@@ -20,16 +22,12 @@ export default function UpdateLocationPage() {
     error: loadError,
   } = useBusiness(businessId!);
 
-  const { mutate, isPending, error } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: (values: Location) =>
       updateLocation(businessId!, locationId!, values),
     onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["businesses", "mine"],
-        }),
-        queryClient.invalidateQueries({ queryKey: ["business", businessId] }),
-      ]);
+      toast.success("Location saved");
+      await invalidateBusiness(queryClient, businessId);
       navigate(`/businesses/${businessId}`);
     },
   });
@@ -37,21 +35,21 @@ export default function UpdateLocationPage() {
   const { mutate: remove, isPending: isDeleting } = useMutation({
     mutationFn: () => deleteLocation(businessId!, locationId!),
     onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["businesses", "mine"],
-        }),
-        queryClient.invalidateQueries({ queryKey: ["business", businessId] }),
-      ]);
       navigate(`/businesses/${businessId}`);
+      void invalidateBusiness(queryClient, businessId);
     },
   });
 
-  if (isLoading) return <p>Loading...</p>;
-  if (isError) return <p className="text-red-600">{loadError.message}</p>;
+  if (isLoading) return <p className="muted">Loading...</p>;
+  if (isError)
+    return (
+      <p role="alert" className="field-error">
+        {loadError.message}
+      </p>
+    );
 
   const location = business.locations.find((l) => l.id === locationId);
-  if (!location) return <p>Location not found</p>;
+  if (!location) return <p className="muted">Location not found</p>;
 
   return (
     <>
@@ -65,19 +63,22 @@ export default function UpdateLocationPage() {
         }}
         onSubmit={(values) => mutate(values)}
         isPending={isPending}
-        error={error?.message}
         submitLabel="Update"
       />
 
-      <button
-        onClick={() => {
-          if (window.confirm("Delete this location")) remove();
-        }}
-        disabled={isDeleting}
-        className="mt-4 border p-2"
-      >
-        Delete
-      </button>
+      <section className="mt-12 max-w-lg border-t border-line pt-6">
+        <h2 className="text-base">Delete location</h2>
+        <p className="muted mt-1">Its resources are deleted too.</p>
+        <button
+          onClick={() => {
+            if (window.confirm("Delete this location?")) remove();
+          }}
+          disabled={isDeleting}
+          className="btn-danger mt-4"
+        >
+          Delete location
+        </button>
+      </section>
     </>
   );
 }

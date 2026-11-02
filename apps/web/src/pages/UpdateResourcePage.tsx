@@ -2,11 +2,13 @@ import { useNavigate, useParams } from "react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   deleteResource,
+  invalidateBusiness,
   updateResource,
   useBusiness,
 } from "../queries/business";
 import type { Resource } from "../schemas/business";
 import ResourceForm from "../components/ResourceForm";
+import { toast } from "sonner";
 
 export default function UpdateResourcePage() {
   const navigate = useNavigate();
@@ -20,41 +22,37 @@ export default function UpdateResourcePage() {
     error: loadError,
   } = useBusiness(businessId!);
 
-  const { mutate, isPending, error } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: (values: Resource) =>
       updateResource(businessId!, locationId!, resourceId!, values),
     onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["businesses", "mine"],
-        }),
-        queryClient.invalidateQueries({ queryKey: ["business", businessId] }),
-      ]);
+      toast.success("Resource saved");
+      await invalidateBusiness(queryClient, businessId);
       navigate(`/businesses/${businessId}`);
     },
   });
 
   const { mutate: remove, isPending: isDeleting } = useMutation({
     mutationFn: () => deleteResource(businessId!, locationId!, resourceId!),
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["businesses", "mine"],
-        }),
-        queryClient.invalidateQueries({ queryKey: ["business", businessId] }),
-      ]);
+    onSuccess: () => {
       navigate(`/businesses/${businessId}`);
+      void invalidateBusiness(queryClient, businessId);
     },
   });
 
-  if (isLoading) return <p>Loading...</p>;
-  if (isError) return <p className="text-red-600">{loadError.message}</p>;
+  if (isLoading) return <p className="muted">Loading...</p>;
+  if (isError)
+    return (
+      <p role="alert" className="field-error">
+        {loadError.message}
+      </p>
+    );
 
   const location = business.locations.find((l) => l.id === locationId);
-  if (!location) return <p>Location not found</p>;
+  if (!location) return <p className="muted">Location not found</p>;
 
   const resource = location.resources.find((r) => r.id === resourceId);
-  if (!resource) return <p>Resource not found</p>;
+  if (!resource) return <p className="muted">Resource not found</p>;
 
   return (
     <>
@@ -66,19 +64,22 @@ export default function UpdateResourcePage() {
         }}
         onSubmit={(values) => mutate(values)}
         isPending={isPending}
-        error={error?.message}
         submitLabel="Update"
       />
 
-      <button
-        onClick={() => {
-          if (window.confirm("Delete this resource")) remove();
-        }}
-        disabled={isDeleting}
-        className="mt-4 border p-2"
-      >
-        Delete
-      </button>
+      <section className="mt-12 max-w-lg border-t border-line pt-6">
+        <h2 className="text-base">Delete resource</h2>
+        <p className="muted mt-1">Guests will no longer be able to book this</p>
+        <button
+          onClick={() => {
+            if (window.confirm("Delete this resource?")) remove();
+          }}
+          disabled={isDeleting}
+          className="btn-danger mt-4"
+        >
+          Delete resource
+        </button>
+      </section>
     </>
   );
 }

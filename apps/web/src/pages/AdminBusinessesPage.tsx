@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { changeBusinessStatus, useAdminBusinesses } from "../queries/admin";
 import type { BusinessStatus } from "../types/admin";
 import Pagination from "../components/Pagination";
+import { humanize } from "../utils/format";
 
 const FILTERS = ["PENDING", "APPROVED", "REJECTED"] as const;
 
@@ -16,11 +17,7 @@ export default function AdminBusinessesPage() {
   const { data, isPending, isError, error, isPlaceholderData } =
     useAdminBusinesses(page, status);
 
-  const {
-    mutate: setStatus,
-    isPending: isSetting,
-    error: setError,
-  } = useMutation({
+  const { mutate: setStatus, isPending: isSetting } = useMutation({
     mutationFn: ({
       businessId,
       status,
@@ -42,67 +39,117 @@ export default function AdminBusinessesPage() {
     );
   };
 
-  if (isPending) return <p>Loading...</p>;
-  if (isError) return <p className="text-red-600">{error.message}</p>;
+  if (isPending) return <p className="muted">Loading...</p>;
+  if (isError)
+    return (
+      <p className="field-error" role="alert">
+        {error.message}
+      </p>
+    );
 
   return (
     <div>
-      <h1 className="text-3xl font-bold">Businesses</h1>
+      <h1>Businesses</h1>
+      <p className="muted mt-1">
+        Apprrove or reject businesses before they appear on the site.
+      </p>
 
-      <select value={status} onChange={(e) => handleFilter(e.target.value)}>
-        <option value="">All</option>
-        {FILTERS.map((s) => (
-          <option key={s} value={s}>
-            {s}
-          </option>
-        ))}
-      </select>
+      <label className="mt-6 block max-w-xs">
+        <span className="mb-1 block text-sm font-semibold">Status</span>
+        <select
+          value={status}
+          onChange={(e) => handleFilter(e.target.value)}
+          className="w-full"
+        >
+          <option value="">All</option>
+          {FILTERS.map((s) => (
+            <option key={s} value={s}>
+              {humanize(s)}
+            </option>
+          ))}
+        </select>
+      </label>
 
       {data.items.length === 0 ? (
-        <p className="mt-4">No businesses</p>
+        <p className="text-muted mt-6">
+          {status
+            ? `No businesses with status - ${status}`
+            : "No businesses yet"}
+        </p>
       ) : (
-        <ul>
-          {data.items.map((business) => (
-            <li key={business.id} className="mt-2 grid grid-cols-5 gap-2">
-              <div>{business.name}</div>
-              <div>{business.email}</div>
-              <div>{business.status}</div>
-              <div className="col-span-2 flex gap-1">
-                {business.status !== "APPROVED" && (
-                  <button
-                    onClick={() =>
-                      setStatus({
-                        businessId: business.id,
-                        status: "APPROVED",
-                      })
-                    }
-                    disabled={isSetting}
-                    className="border p-2 cursor-pointer"
+        <div className="table-wrap mt-6">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>
+                  <span className="sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+          </table>
+          <tbody>
+            {data.items.map((business) => (
+              <tr key={business.id}>
+                <td>
+                  <Link
+                    to={`/businesses/${business.id}`}
+                    className="link font-semibold"
                   >
-                    Approve
-                  </button>
-                )}
-                {business.status !== "REJECTED" && (
-                  <button
-                    onClick={() =>
-                      setStatus({
-                        businessId: business.id,
-                        status: "REJECTED",
-                      })
-                    }
-                    disabled={isSetting}
-                    className="border p-2 cursor-pointer"
-                  >
-                    Reject
-                  </button>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
+                    {business.name}
+                  </Link>
+                  <p className="muted">{humanize(business.type)}</p>
+                </td>
+                <td>{business.email}</td>
+                <td
+                  className={
+                    business.status === "PENDING"
+                      ? "font-semibold"
+                      : "text-muted"
+                  }
+                >
+                  {" "}
+                  {humanize(business.status)}
+                </td>
+                <td>
+                  <div className="flex justify-end gap-2">
+                    {business.status !== "APPROVED" && (
+                      <button
+                        onClick={() =>
+                          setStatus({
+                            businessId: business.id,
+                            status: "APPROVED",
+                          })
+                        }
+                        disabled={isSetting}
+                        className="btn"
+                      >
+                        Approve
+                      </button>
+                    )}
+                    {business.status !== "REJECTED" && (
+                      <button
+                        onClick={() =>
+                          setStatus({
+                            businessId: business.id,
+                            status: "REJECTED",
+                          })
+                        }
+                        disabled={isSetting}
+                        className="btn"
+                      >
+                        Reject
+                      </button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </div>
       )}
-
-      {setError && <p className="text-red-600">{setError.message}</p>}
 
       <Pagination
         page={page}

@@ -3,7 +3,7 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 
 export default function PaymentForm({ onPaid }: { onPaid: () => void }) {
   const stripe = useStripe();
@@ -11,7 +11,7 @@ export default function PaymentForm({ onPaid }: { onPaid: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
 
-  async function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
     if (!stripe || !elements) return;
 
@@ -32,7 +32,7 @@ export default function PaymentForm({ onPaid }: { onPaid: () => void }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <PaymentElement />
       {error && (
         <p className="field-error" role="alert">

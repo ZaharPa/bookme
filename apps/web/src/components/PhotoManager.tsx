@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { BusinessPhoto } from "../types/BusinessDetails";
 import { deletePhoto, uploadPhoto } from "../queries/photo";
 import type { ChangeEvent } from "react";
+import { invalidateBusiness } from "../queries/business";
 
 const MAX_PHOTOS = 5;
 
@@ -10,11 +11,7 @@ type Props = { businessId: string; photos: BusinessPhoto[] };
 export default function PhotoManager({ businessId, photos }: Props) {
   const queryClient = useQueryClient();
 
-  const refresh = () =>
-    Promise.all([
-      queryClient.invalidateQueries({ queryKey: ["business", businessId] }),
-      queryClient.invalidateQueries({ queryKey: ["businesses", "mine"] }),
-    ]);
+  const refresh = () => invalidateBusiness(queryClient, businessId);
 
   const upload = useMutation({
     mutationFn: (file: File) => uploadPhoto(businessId, file),

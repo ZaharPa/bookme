@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createLocation } from "../queries/business";
+import { createLocation, invalidateBusiness } from "../queries/business";
 import LocationForm from "../components/LocationForm";
 import type { Location } from "../schemas/business";
 
@@ -9,15 +9,10 @@ export default function CreateLocationPage() {
   const { businessId } = useParams();
   const queryClient = useQueryClient();
 
-  const { mutate, isPending, error } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: (location: Location) => createLocation(businessId!, location),
     onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["businesses", "mine"],
-        }),
-        queryClient.invalidateQueries({ queryKey: ["business", businessId] }),
-      ]);
+      await invalidateBusiness(queryClient, businessId);
 
       navigate(`/businesses/${businessId}`);
     },
@@ -27,7 +22,6 @@ export default function CreateLocationPage() {
     <LocationForm
       onSubmit={(values) => mutate(values)}
       isPending={isPending}
-      error={error?.message}
       submitLabel="Create"
     />
   );

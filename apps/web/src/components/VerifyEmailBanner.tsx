@@ -12,7 +12,7 @@ export default function VerifyEmailBanner() {
   if (!user || user.emailVerifiedAt) return null;
 
   return (
-    <div className="max-w-lg border border-line bg-white p-6">
+    <div className="max-w-lg panel">
       <h2>Verify your email</h2>
       <p className="mt-1 text-muted">
         You need a verified email to create a business. We will set a link to{" "}

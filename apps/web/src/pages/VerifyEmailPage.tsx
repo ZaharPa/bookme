@@ -15,27 +15,60 @@ export default function VerifyEmailPage() {
     },
   });
 
-  if (!token) return <p>Invalid verificcation link</p>;
+  if (!token)
+    return (
+      <div className="max-w-lg">
+        <h1>This link does not work</h1>
+        <p className="mt-2 text-muted">
+          The verification link is incomplete. You can ask for a new one in your
+          profile.
+        </p>
+        <Link to="/profile" className="btn mt-6">
+          Go to profile
+        </Link>
+      </div>
+    );
 
   if (isSuccess) {
     return (
-      <div>
-        <h1 className="text-3xl font-bold">Email Verified</h1>
-        <Link to="/" className="underline">
-          Home
-        </Link>
+      <div className="panel max-w-lg" role="status">
+        <h1>Email verified</h1>
+        <p className="mt-2 text-muted">
+          Now you can add your business and start taking bookings.
+        </p>
+        <div className="mt-4 flex gap-3">
+          <Link to="/businesses/create" className="btn">
+            Add your business
+          </Link>
+          <Link to="/" className="btn-secondary">
+            Home
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold">Verify your email</h1>
-      {isError && <p className="mt-2 text-red-600">{error.message}</p>}
+    <div className="max-w-lg">
+      <h1>Verify your email</h1>
+      <p className="mt-2 text-muted">
+        Press the button to confirm that this address is yours.
+      </p>
+
+      {isError && (
+        <p className="field-error mt-4" role="alert">
+          {error.message}. The link may have expired: you can request a new one
+          in your
+          <Link to="/profile" className="link">
+            profile
+          </Link>
+        </p>
+      )}
+
       <button
         onClick={() => mutate(token)}
         disabled={isPending}
-        className="mt-4 rounded bg-black px-4 py-2 text-white disabled:opacity-50"
+        className="btn mt-6"
       >
         {isPending ? "Verifying..." : "Confirm email"}
       </button>

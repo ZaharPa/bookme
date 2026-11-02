@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useStats } from "../queries/admin";
+import { formatPrice } from "../utils/format";
 
 export default function AdminStatsPage() {
   const [from, setFrom] = useState("");
@@ -9,27 +10,71 @@ export default function AdminStatsPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold">Stats</h1>
+      <h1>Stats</h1>
+      <p className="muted mt-1">
+        Numbers for the chosen days, including the last day
+      </p>
 
-      <div className="mt-2 flex gap-2">
-        <input
-          type="date"
-          value={from}
-          onChange={(e) => setFrom(e.target.value)}
-        />
-        <input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+      <div className="mt-6 flex flex-wrap gap-4">
+        <label>
+          <span className="mb-1 block text-sm font-semibold">From</span>
+          <input
+            type="date"
+            value={from}
+            onChange={(e) => setFrom(e.target.value)}
+          />
+        </label>
+        <label>
+          <span className="mb-1 block text-sm font-semibold">To</span>
+          <input
+            type="date"
+            value={to}
+            onChange={(e) => setTo(e.target.value)}
+          />
+        </label>
       </div>
 
-      {isFetching && <p>Loading...</p>}
-      {isError && <p className="text-red-600">{error.message}</p>}
+      {(!from || !to) && (
+        <p className="muted mt-6">Choose both dates to see the numbers</p>
+      )}
+      {isFetching && (
+        <p role="status" className="muted mt-6">
+          Loading...
+        </p>
+      )}
+      {isError && (
+        <p role="alert" className="field-error mt-6">
+          {error.message}
+        </p>
+      )}
 
       {data && (
-        <ul className="mt-4">
-          <li>New users: {data.newUsers}</li>
-          <li>New businesses: {data.newBusinesses}</li>
-          <li>Bookings: {data.bookings.count}</li>
-          <li>Revenue: {(data.bookings.totalCents / 100).toFixed(2)} €</li>
-        </ul>
+        <dl className="sheet mt-6 max-w-lg">
+          <div className="sheet-row flex items-baseline justify-between">
+            <dt>New users</dt>
+            <dd className="text-2xl font-semibold tabular-nums">
+              {data.newUsers}
+            </dd>
+          </div>
+          <div className="sheet-row flex items-baseline justify-between">
+            <dt>New businesses</dt>
+            <dd className="text-2xl font-semibold tabular-nums">
+              {data.newBusinesses}
+            </dd>
+          </div>
+          <div className="sheet-row flex items-baseline justify-between">
+            <dt>Bookings</dt>
+            <dd className="text-2xl font-semibold tabular-nums">
+              {data.bookings.count}
+            </dd>
+          </div>
+          <div className="sheet-row flex items-baseline justify-between">
+            <dt>Revenue</dt>
+            <dd className="text-2xl font-semibold tabular-nums">
+              {formatPrice(data.bookings.totalCents)}
+            </dd>
+          </div>
+        </dl>
       )}
     </div>
   );

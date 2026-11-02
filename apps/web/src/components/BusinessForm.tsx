@@ -11,7 +11,6 @@ type Props = {
   defaultValues?: Business;
   onSubmit: (values: Business) => void;
   isPending: boolean;
-  error?: string;
   submitLabel: string;
 };
 
@@ -21,7 +20,6 @@ export default function BusinessForm({
   defaultValues,
   onSubmit,
   isPending,
-  error,
   submitLabel,
 }: Props) {
   const {
@@ -37,6 +35,7 @@ export default function BusinessForm({
       <h1>{submitLabel} business</h1>
 
       <form
+        noValidate
         onSubmit={handleSubmit(onSubmit)}
         className="mt-6 max-w-lg space-y-5"
       >
@@ -93,12 +92,6 @@ export default function BusinessForm({
             })}
           />
         </Field>
-
-        {error && (
-          <p className="field-error" role="alert">
-            {error}
-          </p>
-        )}
 
         <button type="submit" disabled={isPending} className="btn">
           {isPending ? "Saving..." : submitLabel}

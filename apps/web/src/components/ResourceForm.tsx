@@ -7,7 +7,6 @@ type Props = {
   defaultValues?: Resource;
   onSubmit: (values: Resource) => void;
   isPending: boolean;
-  error?: string;
   submitLabel: string;
 };
 
@@ -15,7 +14,6 @@ export default function ResourceForm({
   defaultValues,
   onSubmit,
   isPending,
-  error,
   submitLabel,
 }: Props) {
   const {
@@ -32,6 +30,7 @@ export default function ResourceForm({
       <h1>{submitLabel} resource</h1>
 
       <form
+        noValidate
         onSubmit={handleSubmit(onSubmit)}
         className="mt-6 max-w-lg space-y-5"
       >
@@ -64,12 +63,6 @@ export default function ResourceForm({
             {...register("capacity", { valueAsNumber: true })}
           />
         </Field>
-
-        {error && (
-          <p className="field-error" role="alert">
-            {error}
-          </p>
-        )}
 
         <button type="submit" disabled={isPending} className="btn">
           {isPending ? "Saving..." : submitLabel}

@@ -1,9 +1,14 @@
 import { useNavigate, useParams } from "react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type Business } from "../schemas/business";
-import { updateBusiness, useBusiness } from "../queries/business";
+import {
+  invalidateBusiness,
+  updateBusiness,
+  useBusiness,
+} from "../queries/business";
 import BusinessForm from "../components/BusinessForm";
 import PhotoManager from "../components/PhotoManager";
+import { toast } from "sonner";
 
 export default function UpdateBusinessPage() {
   const navigate = useNavigate();
@@ -17,21 +22,22 @@ export default function UpdateBusinessPage() {
     error: loadError,
   } = useBusiness(businessId!);
 
-  const { mutate, isPending, error } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: (values: Business) => updateBusiness(businessId!, values),
     onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["businesses", "mine"],
-        }),
-        queryClient.invalidateQueries({ queryKey: ["business", businessId] }),
-      ]);
+      toast.success("Business saved");
+      await invalidateBusiness(queryClient, businessId);
       navigate("/businesses/mine");
     },
   });
 
-  if (isLoading) return <p>Loading...</p>;
-  if (isError) return <p className="text-red-600">{loadError.message}</p>;
+  if (isLoading) return <p className="muted">Loading...</p>;
+  if (isError)
+    return (
+      <p role="alert" className="field-error">
+        {loadError.message}
+      </p>
+    );
 
   return (
     <>
@@ -46,9 +52,9 @@ export default function UpdateBusinessPage() {
         }}
         onSubmit={(values) => mutate(values)}
         isPending={isPending}
-        error={error?.message}
         submitLabel="Update"
       />
+
       <PhotoManager businessId={business.id} photos={business.photos} />
     </>
   );

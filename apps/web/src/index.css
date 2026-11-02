@@ -33,6 +33,15 @@
   textarea {
     @apply rounded-sm border border-line bg-white px-3 py-2.5;
   }
+  table {
+    @apply w-full border-collapse text-left;
+  }
+  th {
+    @apply px-6 py-3 text-sm font-normal text-muted;
+  }
+  td {
+    @apply border-t border-line px-6 py-4 align-middle;
+  }
 }
 
 @layer components {
@@ -62,6 +71,12 @@
   }
   .page-box {
     @apply min-w-11 px-3 py-2.5 text-center text-sm tabular-nums;
+  }
+  .panel {
+    @apply border border-line bg-white p-6;
+  }
+  .table-wrap {
+    @apply overflow-x-auto border-y border-line bg-white;
   }
   .sheet {
     @apply border-y border-line bg-white;

@@ -2,16 +2,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { LocationSchema, type Location } from "../schemas/business";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Field from "./Field";
-
-const DAYS = [
-  ["mon", "Monday"],
-  ["tue", "Tuesday"],
-  ["wed", "Wednesday"],
-  ["thu", "Thursday"],
-  ["fri", "Friday"],
-  ["sat", "Saturday"],
-  ["sun", "Sunday"],
-] as const;
+import { DAYS } from "../utils/days";
 
 const WORK_DAY = { open: "09:00", close: "18:00" };
 
@@ -29,7 +20,6 @@ type Props = {
   defaultValues?: Location;
   onSubmit: (values: Location) => void;
   isPending: boolean;
-  error?: string;
   submitLabel: string;
 };
 
@@ -37,7 +27,6 @@ export default function LocationForm({
   defaultValues,
   onSubmit,
   isPending,
-  error,
   submitLabel,
 }: Props) {
   const {
@@ -61,6 +50,7 @@ export default function LocationForm({
       <h1>{submitLabel} location</h1>
 
       <form
+        noValidate
         onSubmit={handleSubmit(onSubmit)}
         className="mt-6 max-w-lg space-y-5"
       >
@@ -137,8 +127,6 @@ export default function LocationForm({
             })}
           </div>
         </fieldset>
-
-        {error && <p className="field-error">{error}</p>}
 
         <button type="submit" disabled={isPending} className="btn">
           {isPending ? "Saving..." : submitLabel}

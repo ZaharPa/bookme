@@ -1,10 +1,20 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, QueryClient, useQuery } from "@tanstack/react-query";
 import { api } from "../lib/api";
 import type { Paginated } from "../types/Paginated";
 import type { BusinessDetails } from "../types/BusinessDetails";
 import { ApiError } from "../lib/error";
 import { useAuth } from "../hooks/useAuth";
 import type { Business, Location, Resource } from "../schemas/business";
+
+export function invalidateBusiness(
+  queryClient: QueryClient,
+  businessId?: string,
+) {
+  return Promise.all([
+    queryClient.invalidateQueries({ queryKey: ["businesses"] }),
+    queryClient.invalidateQueries({ queryKey: ["business", businessId] }),
+  ]);
+}
 
 export function useBusinesses(page: number) {
   return useQuery({
