@@ -9,6 +9,8 @@ export type BusinessType =
   | "MEDICAL"
   | "TUTORING";
 
+export type BusinessStatus = "PENDING" | "APPROVED" | "REJECTED";
+
 export type Resource = {
   id: string;
   name: string;
@@ -37,6 +39,7 @@ export type BusinessDetails = {
   email: string;
   phone: string | null;
   type: BusinessType;
+  status: BusinessStatus;
   description: string | null;
   cancellationWindowHours: number;
   locations: Location[];

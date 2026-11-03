@@ -2,6 +2,7 @@ import { Link, useSearchParams } from "react-router";
 import Pagination from "../components/Pagination";
 import { deleteBusiness, useMyBusinesses } from "../queries/business";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatPrice, humanize } from "../utils/format";
 
 export default function MyBusinessesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,105 +23,115 @@ export default function MyBusinessesPage() {
       queryClient.invalidateQueries({ queryKey: ["businesses"] }),
   });
 
-  if (isPending) return <p>Loading...</p>;
-  if (isError) return <p>{error.message}</p>;
+  if (isPending) return <p className="muted">Loading...</p>;
+  if (isError)
+    return (
+      <p role="alert" className="field-error">
+        {error.message}
+      </p>
+    );
 
   return (
     <div>
-      <h1 className="text-3xl font-bold">My businesses</h1>
-      <p className="mt-2 text-gray-600">Text under</p>
-
-      <Link
-        to="/businesses/bookings/mine"
-        className="underline border border-gray-300"
-      >
-        My businesses bookings
-      </Link>
-
-      <Link
-        to="/businesses/create"
-        className="underline border border-gray-300"
-      >
-        Create new business
-      </Link>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1>My businesses</h1>
+        <Link to="/businesses/create" className="btn">
+          Addbusiness
+        </Link>
+      </div>
 
       {data.items.length === 0 ? (
-        <p className="mt-4">No businesses yet</p>
+        <p className="mt-4 muted">
+          {" "}
+          You have no businesses yet. Add one to start taking bookings
+        </p>
       ) : (
-        <ul>
+        <ul className="mt-6 space-y-10">
           {data.items.map((business) => (
-            <li key={business.id} className=" mt-4">
-              <div className="grid grid-cols-5 gap-2 text-center">
-                <Link
-                  to={`/businesses/${business.id}`}
-                  className="col-span-3 grid grid-cols-3 gap-2 "
-                >
-                  <div>{business.name}</div>
-                  <div>{business.phone}</div>
-                  <div>{business.description}</div>
-                </Link>
-                <Link
-                  to={`/businesses/${business.id}/update`}
-                  className="border border-gray-400 p-2 cursor-pointer"
-                >
-                  Update
-                </Link>
+            <li key={business.id}>
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ink pb-3">
+                <div>
+                  <Link
+                    to={`/businesses/${business.id}`}
+                    className="link text-xl font-semibold"
+                  >
+                    {business.name}
+                  </Link>
+                  <p className="muted">
+                    {humanize(business.type)}, {humanize(business.status)}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Link to={`/businesses/${business.id}/update`}>Edit</Link>
+                </div>
                 <button
                   onClick={() => {
-                    if (window.confirm("Delete this business?"))
+                    if (
+                      window.confirm(
+                        "Delete this business with all its locations and resources?",
+                      )
+                    )
                       remove(business.id);
                   }}
                   disabled={isDeleting}
-                  className="border border-gray-400 p-2 cursor-pointer"
+                  className="btn-danger"
                 >
                   Delete
                 </button>
               </div>
 
-              <ul className="ml-6 mt-2">
-                {business.locations.map((location) => (
-                  <li key={location.id} className="mt-2">
-                    <div className="flex gap-2">
-                      <span>
-                        {location.city} {location.country} {location.address}
-                      </span>
-                      <Link
-                        to={`/businesses/${business.id}/locations/${location.id}/update`}
-                        className="border border-gray-400 p-2 cursor-pointer"
-                      >
-                        Update
-                      </Link>
-                    </div>
-
-                    <ul className="ml-6">
-                      {location.resources.map((resource) => (
-                        <li key={resource.id} className="flex gap-2">
-                          <span>
-                            {resource.name}{" "}
-                            {(resource.priceCents / 100).toFixed(2)} $
-                          </span>
-                          <Link
-                            to={`/businesses/${business.id}/locations/${location.id}/resources/${resource.id}/update`}
-                            className="border border-gray-400 p-2 cursor-pointer"
-                          >
-                            Update
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-
+              {business.locations.map((location) => (
+                <section key={location.id} className="mt-6">
+                  <div className="flex items-baseline justify-between gap-4">
+                    <h2 className="text-base">
+                      {location.address}, {location.city}
+                    </h2>
                     <Link
-                      to={`/businesses/${business.id}/locations/${location.id}/resources/create`}
-                      className="ml-6 mt-1 inline-block border border-gray-400 p-2"
+                      to={`/businesses/${business.id}/locations/${location.id}/update`}
+                      aria-label={`Edit location ${location.address}`}
+                      className="link"
                     >
-                      Add resource
+                      Edit location
                     </Link>
-                  </li>
-                ))}
-              </ul>
+                  </div>
+
+                  <ul className="sheet mt-2">
+                    {location.resources.map((resource) => (
+                      <li
+                        key={resource.id}
+                        className="sheet-row flex items-baseline justify-between gap-4 py-3"
+                      >
+                        <span>
+                          <span className="font-semibold">{resource.name}</span>
+                          <span className="tabular-nums text-muted">
+                            {formatPrice(resource.priceCents)} per hour
+                          </span>
+                        </span>
+                        <Link
+                          to={`/businesses/${business.id}/locations/${location.id}/resources/${resource.id}/update`}
+                          aria-label={`Edit ${resource.name}`}
+                          className="link"
+                        >
+                          Edit
+                        </Link>
+                      </li>
+                    ))}
+                    <li className="sheet-row py-3">
+                      <Link
+                        to={`/businesses/${business.id}/locations/${location.id}/resources/create`}
+                        className="link"
+                      >
+                        Add resource
+                      </Link>
+                    </li>
+                  </ul>
+                </section>
+              ))}
+
               <Link
                 to={`/businesses/${business.id}/locations/create`}
-                className="ml-6 mt-2 inline-block border border-gray-400 p-2"
+                className="
+                link mt-6 inline-block"
               >
                 Add location
               </Link>
@@ -134,7 +145,7 @@ export default function MyBusinessesPage() {
         totalPages={data.totalPages}
         isLoading={isPlaceholderData}
         onPageChange={handlePageChange}
-      ></Pagination>
+      />
     </div>
   );
 }

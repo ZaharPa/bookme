@@ -4,6 +4,7 @@ import { ApiError, fieldError } from "../lib/error";
 import { useForm } from "react-hook-form";
 import { type RegistrationForm, registrationSchema } from "../schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Field from "../components/Field";
 
 export default function RegistrationPage() {
   const { registration } = useAuth();
@@ -24,13 +25,13 @@ export default function RegistrationPage() {
       if (err instanceof ApiError) {
         const nameIssue = fieldError(err.details, "name");
         const emailIssue = fieldError(err.details, "email");
-        const passowordIssue = fieldError(err.details, "password");
+        const passwordIssue = fieldError(err.details, "password");
 
         if (nameIssue) setError("name", { message: nameIssue });
         if (emailIssue) setError("email", { message: emailIssue });
-        if (passowordIssue) setError("password", { message: passowordIssue });
+        if (passwordIssue) setError("password", { message: passwordIssue });
 
-        if (!nameIssue && !emailIssue && !passowordIssue)
+        if (!nameIssue && !emailIssue && !passwordIssue)
           setError("root", { message: err.message });
       } else {
         setError("root", { message: "Something went wrong" });
@@ -39,68 +40,60 @@ export default function RegistrationPage() {
   }
 
   return (
-    <form
-      noValidate
-      onSubmit={(e) => {
-        void handleSubmit(onSubmit)(e);
-      }}
-      className="mx-auto flex max-w-sm flex-col gap-3"
-    >
-      <h1 className="text-2xl font-bold">Registration</h1>
+    <div className="max-w-sm">
+      <h1>Sign up</h1>
 
-      <input
-        type="text"
-        placeholder="Your name"
-        {...register("name")}
-        autoComplete="name"
-        className="rounded border p-2"
-      />
-      {errors.name && <p className="text-red-600">{errors.name.message}</p>}
-
-      <input
-        type="email"
-        placeholder="Email"
-        {...register("email")}
-        autoComplete="email"
-        className="rounded border p-2"
-      />
-      {errors.email && <p className="text-red-600">{errors.email.message}</p>}
-
-      <input
-        type="password"
-        placeholder="Password"
-        {...register("password")}
-        autoComplete="new-password"
-        className="rounded border p-2"
-      />
-      {errors.password && (
-        <p className="text-red-600">{errors.password.message}</p>
-      )}
-
-      <input
-        type="password"
-        placeholder="Confirm password"
-        {...register("confirmPassword")}
-        autoComplete="new-password"
-        className="rounded border p-2"
-      />
-      {errors.confirmPassword && (
-        <p className="text-red-600">{errors.confirmPassword.message}</p>
-      )}
-
-      {errors.root && <p className="text-red-600">{errors.root.message}</p>}
-
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="rounded bg-gray-900 p-2 text-white disabled:opacity-50"
+      <form
+        noValidate
+        onSubmit={(e) => {
+          void handleSubmit(onSubmit)(e);
+        }}
+        className="mt-6 space-y-5"
       >
-        {isSubmitting ? "Register in ..." : "Register"}
-      </button>
+        <Field label="Name" error={errors.name?.message ?? ""}>
+          <input type="ematextil" autoComplete="name" {...register("name")} />
+        </Field>
+        <Field label="Email" error={errors.email?.message ?? ""}>
+          <input type="email" autoComplete="email" {...register("email")} />
+        </Field>
+        <Field
+          label="Password"
+          hint="At least 8 characters, with one capital letter and one number"
+          error={errors.password?.message ?? ""}
+        >
+          <input
+            type="password"
+            autoComplete="new-password"
+            {...register("password")}
+          />
+        </Field>
+        <Field
+          label="Confirm password"
+          error={errors.confirmPassword?.message ?? ""}
+        >
+          <input
+            type="password"
+            autoComplete="new-password"
+            {...register("confirmPassword")}
+          />
+        </Field>
 
-      <Link to="/login" className="pt-4 text-sm underline text-gray-500">
-        Already have an account? Log in
-      </Link>
-    </form>
+        {errors.root && (
+          <p role="alert" className="field-error">
+            {errors.root.message}
+          </p>
+        )}
+        <button type="submit" disabled={isSubmitting} className="btn w-full">
+          {isSubmitting ? "Creating acount..." : "Create account"}
+        </button>
+      </form>
+
+      <p className="mt-6">
+        <span className="muted">Already have an account? </span>
+        <Link to="/login" className="link">
+          Log in
+        </Link>
+      </p>
+    </div>
   );
 }

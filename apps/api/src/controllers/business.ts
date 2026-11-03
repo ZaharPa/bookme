@@ -1,11 +1,12 @@
 import type { Request, Response } from "express";
-import type {
-  Business,
-  BusinessUpdate,
-  Location,
-  LocationUpdate,
-  Resource,
-  ResourceUpdate,
+import {
+  BUSINESS_TYPES,
+  type Business,
+  type BusinessUpdate,
+  type Location,
+  type LocationUpdate,
+  type Resource,
+  type ResourceUpdate,
 } from "../schemas/business";
 import { db } from "../prisma/db";
 import { errorResponse, successResponse } from "../utils/response";
@@ -49,13 +50,20 @@ export async function addResource(
 
 export async function viewAllBusinesses(req: Request, res: Response) {
   const page = Math.max(1, Math.floor(Number(req.query.page)) || 1);
-  const perPage = 2;
+  const perPage = Math.min(
+    20,
+    Math.max(1, Math.floor(Number(req.query.perPage)) || 10),
+  );
+  const type = BUSINESS_TYPES.find((t) => t === req.query.type);
+
+  const filter = {
+    status: "APPROVED" as const,
+    deletedAt: null,
+    ...(type && { type }),
+  };
 
   const [businesses, count] = await Promise.all([
-    db.orm.public.Business.where({
-      status: "APPROVED",
-      deletedAt: null,
-    })
+    db.orm.public.Business.where(filter)
       .include("locations", (location) =>
         location
           .where({ deletedAt: null })
@@ -68,10 +76,9 @@ export async function viewAllBusinesses(req: Request, res: Response) {
       .limit(perPage)
       .offset((page - 1) * perPage)
       .all(),
-    db.orm.public.Business.where({
-      status: "APPROVED",
-      deletedAt: null,
-    }).aggregate((a) => ({ total: a.count() })),
+    db.orm.public.Business.where(filter).aggregate((a) => ({
+      total: a.count(),
+    })),
   ]);
 
   const businessesWithPhotos = businesses.map((business) => ({

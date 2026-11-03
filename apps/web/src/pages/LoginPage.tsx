@@ -4,6 +4,7 @@ import { ApiError, fieldError } from "../lib/error";
 import { useForm } from "react-hook-form";
 import { type LoginForm, loginSchema } from "../schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Field from "../components/Field";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -37,48 +38,49 @@ export default function LoginPage() {
   }
 
   return (
-    <form
-      noValidate
-      onSubmit={(e) => {
-        void handleSubmit(onSubmit)(e);
-      }}
-      className="mx-auto flex max-w-sm flex-col gap-3"
-    >
-      <h1 className="text-2xl font-bold">Login</h1>
-      <input
-        type="email"
-        placeholder="Email"
-        {...register("email")}
-        className="rounded border p-2"
-      />
-      {errors.email && <p className="text-red-600">{errors.email.message}</p>}
-      <input
-        type="password"
-        placeholder="Password"
-        {...register("password")}
-        className="rounded border p-2"
-      />
-      {errors.password && (
-        <p className="text-red-600">{errors.password.message}</p>
-      )}
-      {errors.root && <p className="text-red-600">{errors.root.message}</p>}
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="rounded bg-gray-900 p-2 text-white disabled:opacity-50"
-      >
-        {isSubmitting ? "Logging in ..." : "Login"}
-      </button>
-      <Link to="/register" className="pt-4 text-sm underline text-gray-500">
-        Don't have an account? Register
-      </Link>
+    <div className="max-w-sm">
+      <h1>Log in</h1>
 
-      <Link
-        to="/forget-password"
-        className="pt-4 text-sm underline text-gray-500"
+      <form
+        noValidate
+        onSubmit={(e) => {
+          void handleSubmit(onSubmit)(e);
+        }}
+        className="mt-6 space-y-5"
       >
-        Forget Password
-      </Link>
-    </form>
+        <Field label="Email" error={errors.email?.message ?? ""}>
+          <input type="email" autoComplete="email" {...register("email")} />
+        </Field>
+        <Field label="Password" error={errors.password?.message ?? ""}>
+          <input
+            type="password"
+            autoComplete="current-password"
+            {...register("password")}
+          />
+        </Field>
+
+        {errors.root && (
+          <p role="alert" className="field-error">
+            {errors.root.message}
+          </p>
+        )}
+        <button type="submit" disabled={isSubmitting} className="btn w-full">
+          {isSubmitting ? "Logging in ..." : "Log in"}
+        </button>
+      </form>
+
+      <p className="mt-6">
+        <Link to="/register" className="link">
+          Don't have an account? Register
+        </Link>
+      </p>
+
+      <p className="mt-2">
+        <span className="muted">No account yet?</span>
+        <Link to="/forget-password" className="link">
+          Sign up
+        </Link>
+      </p>
+    </div>
   );
 }

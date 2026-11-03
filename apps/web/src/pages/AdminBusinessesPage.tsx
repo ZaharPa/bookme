@@ -55,7 +55,7 @@ export default function AdminBusinessesPage() {
       </p>
 
       <label className="mt-6 block max-w-xs">
-        <span className="mb-1 block text-sm font-semibold">Status</span>
+        <span className="label">Status</span>
         <select
           value={status}
           onChange={(e) => handleFilter(e.target.value)}
@@ -89,65 +89,64 @@ export default function AdminBusinessesPage() {
                 </th>
               </tr>
             </thead>
-          </table>
-          <tbody>
-            {data.items.map((business) => (
-              <tr key={business.id}>
-                <td>
-                  <Link
-                    to={`/businesses/${business.id}`}
-                    className="link font-semibold"
+            <tbody>
+              {data.items.map((business) => (
+                <tr key={business.id}>
+                  <td>
+                    <Link
+                      to={`/businesses/${business.id}`}
+                      className="link font-semibold"
+                    >
+                      {business.name}
+                    </Link>
+                    <p className="muted">{humanize(business.type)}</p>
+                  </td>
+                  <td>{business.email}</td>
+                  <td
+                    className={
+                      business.status === "PENDING"
+                        ? "font-semibold"
+                        : "text-muted"
+                    }
                   >
-                    {business.name}
-                  </Link>
-                  <p className="muted">{humanize(business.type)}</p>
-                </td>
-                <td>{business.email}</td>
-                <td
-                  className={
-                    business.status === "PENDING"
-                      ? "font-semibold"
-                      : "text-muted"
-                  }
-                >
-                  {" "}
-                  {humanize(business.status)}
-                </td>
-                <td>
-                  <div className="flex justify-end gap-2">
-                    {business.status !== "APPROVED" && (
-                      <button
-                        onClick={() =>
-                          setStatus({
-                            businessId: business.id,
-                            status: "APPROVED",
-                          })
-                        }
-                        disabled={isSetting}
-                        className="btn"
-                      >
-                        Approve
-                      </button>
-                    )}
-                    {business.status !== "REJECTED" && (
-                      <button
-                        onClick={() =>
-                          setStatus({
-                            businessId: business.id,
-                            status: "REJECTED",
-                          })
-                        }
-                        disabled={isSetting}
-                        className="btn"
-                      >
-                        Reject
-                      </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+                    {humanize(business.status)}
+                  </td>
+                  <td>
+                    <div className="flex justify-end gap-2">
+                      {business.status !== "APPROVED" && (
+                        <button
+                          onClick={() =>
+                            setStatus({
+                              businessId: business.id,
+                              status: "APPROVED",
+                            })
+                          }
+                          disabled={isSetting}
+                          className="btn"
+                        >
+                          Approve
+                        </button>
+                      )}
+                      {business.status !== "REJECTED" && (
+                        <button
+                          onClick={() =>
+                            setStatus({
+                              businessId: business.id,
+                              status: "REJECTED",
+                            })
+                          }
+                          disabled={isSetting}
+                          className="btn-danger"
+                        >
+                          Reject
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 

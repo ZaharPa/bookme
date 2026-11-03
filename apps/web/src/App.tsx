@@ -27,12 +27,15 @@ import ProfilePage from "./pages/ProfilePage";
 import ForgetPasswordPage from "./pages/ForgetPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import AccountLayout from "./components/AccountLayout";
+import PlacesPage from "./pages/PlacesPage";
 
 export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
         <Route index element={<HomePage />} />
+        <Route path="/places" element={<PlacesPage />} />
+
         <Route path="/businesses/:businessId" element={<BusinessPage />} />
 
         <Route path="/verify-email" element={<VerifyEmailPage />} />

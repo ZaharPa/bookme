@@ -37,7 +37,7 @@ export default function ViewBookingPage() {
         <div className="sheet-row flex justify-between gap-4 py-3">
           <dt className="text-muted">Status</dt>
           <dd>
-            <BookingStatus status="data.status" />
+            <BookingStatus status={data.status} />
           </dd>
         </div>
       </dl>

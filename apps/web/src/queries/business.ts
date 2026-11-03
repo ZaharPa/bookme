@@ -16,11 +16,17 @@ export function invalidateBusiness(
   ]);
 }
 
-export function useBusinesses(page: number) {
+export function useBusinesses(page: number, type = "", perPage = 10) {
   return useQuery({
-    queryKey: ["businesses", page],
-    queryFn: () =>
-      api.get<Paginated<BusinessDetails>>(`/businesses?page=${page}`),
+    queryKey: ["businesses", page, type, perPage],
+    queryFn: () => {
+      const params = new URLSearchParams({
+        page: String(page),
+        perPage: String(perPage),
+      });
+      if (type) params.set("type", type);
+      return api.get<Paginated<BusinessDetails>>(`/businesses?${params}`);
+    },
     placeholderData: keepPreviousData,
   });
 }

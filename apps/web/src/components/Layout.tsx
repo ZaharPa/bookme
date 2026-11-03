@@ -12,7 +12,7 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-line bg-white">
+      <header className="border-b border-t-4 border-line border-t-brand bg-white">
         <nav className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
           <div className="flex items-center gap-8">
             <Link to="/" className="text-xl font-semibold">

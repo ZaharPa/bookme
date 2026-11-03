@@ -5,6 +5,9 @@ import { type ChangePassword, ChangePasswordSchema } from "../schemas/password";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { changePassword } from "../queries/password";
+import { toast } from "sonner";
+import VerifyEmailBanner from "../components/VerifyEmailBanner";
+import Field from "../components/Field";
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
@@ -16,9 +19,10 @@ export default function ProfilePage() {
     formState: { errors },
   } = useForm<ChangePassword>({ resolver: zodResolver(ChangePasswordSchema) });
 
-  const { mutate, isPending, error } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: changePassword,
     onSuccess: async () => {
+      toast.success("Password changed");
       try {
         await logout();
       } finally {
@@ -28,41 +32,60 @@ export default function ProfilePage() {
   });
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold">Profile</h1>
-      <p>{user?.name}</p>
-      <p>{user?.email}</p>
-      <p>Email verified: {user?.emailVerifiedAt ? "yes" : "no"}</p>
+    <div className="max-w-lg">
+      <h1>Profile</h1>
 
-      <h2 className="text-xl mt-6 font-semibold">Change password</h2>
+      <dl className="sheet mt-6">
+        <div className="sheet-row flex justify-between gap-4 py-3">
+          <dt className="text-muted">Name</dt>
+          <dd>{user?.name}</dd>
+        </div>
+        <div className="sheet-row flex justify-between gap-4 py-3">
+          <dt className="text-muted">Email</dt>
+          <dd>{user?.email}</dd>
+        </div>
+        <div className="sheet-row flex justify-between gap-4 py-3">
+          <dt className="text-muted">Email status</dt>
+          <dd>{user?.emailVerifiedAt ? "Verified" : "Not verified"}</dd>
+        </div>
+      </dl>
+
+      <div className="mt-6">
+        <VerifyEmailBanner />
+      </div>
+
+      <h2 className="mt-10">Change password</h2>
+      <p className="muted mt-1">
+        You will be logged out and need to log in with the new password.
+      </p>
+
       <form
         onSubmit={handleSubmit((v) => mutate(v))}
-        className="mt-2 space-y-3"
+        className="mt-4 space-y-5"
       >
-        <div>
+        <Field
+          label="Current password"
+          error={errors.oldPassword?.message ?? ""}
+        >
           <input
-            type="passoword"
+            type="password"
             autoComplete="current-password"
-            placeholder="Current password"
             {...register("oldPassword")}
           />
-          {errors.oldPassword && (
-            <p className="text-red-600">{errors.oldPassword.message}</p>
-          )}
-        </div>
-        <div>
+        </Field>
+        <Field
+          label="New password"
+          hint="At least 8 characters with one capital an one number"
+          error={errors.newPassword?.message ?? ""}
+        >
           <input
-            type="passoword"
+            type="password"
             autoComplete="new-password"
-            placeholder="New password"
             {...register("newPassword")}
           />
-          {errors.newPassword && (
-            <p className="text-red-600">{errors.newPassword.message}</p>
-          )}
-        </div>
-        {error && <p className="text-red-600">{error.message}</p>}
-        <button type="submit" disabled={isPending} className="border p-2">
+        </Field>
+
+        <button type="submit" disabled={isPending} className="btn">
           {isPending ? "Saving..." : "Change Password"}
         </button>
       </form>

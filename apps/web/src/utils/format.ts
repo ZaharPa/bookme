@@ -1,7 +1,7 @@
 import { parseDbDate } from "./time";
 
 export function humanize(value: string) {
-  const text = value.replace(/_/g, "").toLowerCase();
+  const text = value.replace("_", " ").toLowerCase();
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const BUSINESS_TYPES = [
+export const BUSINESS_TYPES = [
   "RESTAURANT",
   "BARBERSHOP",
   "COWORKING",
