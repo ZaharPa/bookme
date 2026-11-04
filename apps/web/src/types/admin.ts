@@ -16,8 +16,17 @@ export type AdminUser = {
   bannedAt: string | null;
 };
 
+export type DailyStats = {
+  date: string;
+  newUsers: number;
+  newBusinesses: number;
+  bookings: number;
+  revenueCents: number;
+};
+
 export type Stats = {
   newUsers: number;
   newBusinesses: number;
   bookings: { count: number; totalCents: number };
+  daily: DailyStats[];
 };

@@ -4,6 +4,8 @@ import { errorResponse, successResponse } from "../utils/response";
 import { StatsQuerySchema, type BusinessStatus } from "../schemas/admin";
 
 const BUSINESS_STATUSES = ["PENDING", "APPROVED", "REJECTED"] as const;
+const DAY_MS = 86_400_000;
+const MAX_DAYS = 92;
 
 export async function allBusinesses(req: Request, res: Response) {
   const page = Math.max(1, Math.floor(Number(req.query.page)) || 1);
@@ -55,6 +57,15 @@ export async function allUsers(req: Request, res: Response) {
   });
 }
 
+function isValidTimeZone(timeZone: string) {
+  try {
+    new Intl.DateTimeFormat("en", { timeZone });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function stats(req: Request, res: Response) {
   const parsed = StatsQuerySchema.safeParse(req.query);
 
@@ -62,36 +73,88 @@ export async function stats(req: Request, res: Response) {
     return errorResponse(res, 400, "Invalid stats query");
   }
 
-  const from = parsed.data.from.toISOString();
-  const to = parsed.data.to.toISOString();
+  const timeZone =
+    typeof req.query.timeZone === "string" ? req.query.timeZone : "UTC";
+  if (!isValidTimeZone(timeZone))
+    return errorResponse(res, 400, "Invalid time zone");
 
-  const users = await db.orm.public.User.where((u) => u.createdAt.gte(from))
-    .where((u) => u.createdAt.lt(to))
-    .aggregate((a) => ({ total: a.count() }));
+  const { from, to } = parsed.data;
+  if ((to.getTime() - from.getTime()) / DAY_MS > MAX_DAYS)
+    return errorResponse(res, 400, `Range is limited to ${MAX_DAYS} days`);
 
-  const businesses = await db.orm.public.Business.where((b) =>
-    b.createdAt.gte(from),
-  )
-    .where((b) => b.createdAt.lt(to))
-    .aggregate((a) => ({ total: a.count() }));
+  const fromIso = from.toISOString();
+  const toIso = to.toISOString();
 
-  const bookings = await db.orm.public.Booking.where((b) =>
-    b.createdAt.gte(from),
-  )
-    .where((b) => b.createdAt.lt(to))
-    .where((b) => b.status.in(["COMPLETED", "CONFIRMED"]))
-    .aggregate((a) => ({
-      total: a.count(),
-      amountCents: a.sum("totalAmountCents"),
-    }));
+  const [users, businesses, bookings] = await Promise.all([
+    db.orm.public.User.where((u) => u.createdAt.gte(fromIso))
+      .where((u) => u.createdAt.lt(toIso))
+      .select("createdAt")
+      .all(),
+    db.orm.public.Business.where((b) => b.createdAt.gte(fromIso))
+      .where((b) => b.createdAt.lt(toIso))
+      .select("createdAt")
+      .all(),
+    db.orm.public.Booking.where((b) => b.createdAt.gte(fromIso))
+      .where((b) => b.createdAt.lt(toIso))
+      .where((b) => b.status.in(["COMPLETED", "CONFIRMED"]))
+      .select("createdAt", "totalAmountCents")
+      .all(),
+  ]);
+
+  const dayFormat = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  const dayOf = (value: string) => dayFormat.format(new Date(value));
+
+  const days = new Map<
+    string,
+    {
+      date: string;
+      newUsers: number;
+      newBusinesses: number;
+      bookings: number;
+      revenueCents: number;
+    }
+  >();
+
+  for (let t = from.getTime() + DAY_MS / 2; t < to.getTime(); t += DAY_MS) {
+    const date = dayFormat.format(t);
+    days.set(date, {
+      date,
+      newUsers: 0,
+      newBusinesses: 0,
+      bookings: 0,
+      revenueCents: 0,
+    });
+  }
+
+  for (const row of users) {
+    const day = days.get(dayOf(row.createdAt));
+    if (day) day.newUsers++;
+  }
+  for (const row of businesses) {
+    const day = days.get(dayOf(row.createdAt));
+    if (day) day.newBusinesses++;
+  }
+  for (const row of bookings) {
+    const day = days.get(dayOf(row.createdAt));
+    if (day) {
+      day.bookings++;
+      day.revenueCents += row.totalAmountCents;
+    }
+  }
 
   return successResponse(res, 200, {
-    newUsers: users.total,
-    newBusinesses: businesses.total,
+    newUsers: users.length,
+    newBusinesses: businesses.length,
     bookings: {
-      count: bookings.total,
-      totalCents: bookings.amountCents ?? 0,
+      count: bookings.length,
+      totalCents: bookings.reduce((sum, b) => sum + b.totalAmountCents, 0),
     },
+    daily: [...days.values()],
   });
 }
 

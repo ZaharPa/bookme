@@ -16,13 +16,19 @@ export function invalidateBusiness(
   ]);
 }
 
-export function useBusinesses(page: number, type = "", perPage = 10) {
+export function useBusinesses(
+  page: number,
+  type = "",
+  perPage = 10,
+  sort: "new" | "popular" = "new",
+) {
   return useQuery({
-    queryKey: ["businesses", page, type, perPage],
+    queryKey: ["businesses", page, type, perPage, sort],
     queryFn: () => {
       const params = new URLSearchParams({
         page: String(page),
         perPage: String(perPage),
+        sort,
       });
       if (type) params.set("type", type);
       return api.get<Paginated<BusinessDetails>>(`/businesses?${params}`);

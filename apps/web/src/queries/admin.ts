@@ -53,6 +53,7 @@ export function useStats(from: string, to: string) {
       const params = new URLSearchParams({
         from: start.toISOString(),
         to: end.toISOString(),
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
       return api.get<Stats>(`/admin/stats?${params}`);
     },

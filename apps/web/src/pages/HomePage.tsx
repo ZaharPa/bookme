@@ -5,8 +5,11 @@ import { humanize } from "../utils/format";
 import FeaturedPlace from "../components/FeaturedPlace";
 
 export default function HomePage() {
-  const { data, isPending, isError, error } = useBusinesses(1, "", 3);
-  const [first, ...rest] = data?.items ?? [];
+  const latest = useBusinesses(1, "", 3);
+  const popular = useBusinesses(1, "", 3, "popular");
+
+  const [firstLatest, ...restLatest] = latest.data?.items ?? [];
+  const [firstPopular, ...restPopular] = popular.data?.items ?? [];
 
   return (
     <div>
@@ -38,25 +41,52 @@ export default function HomePage() {
       </section>
 
       <section className="mt-16">
-        <h2>New places</h2>
-
-        {isPending && <p className="muted mt-3">Loading…</p>}
-        {isError && (
+        {latest.isPending && <p className="muted mt-3">Loading…</p>}
+        {latest.isError && (
           <p className="field-error mt-3" role="alert">
-            {error.message}
+            {latest.error.message}
           </p>
         )}
-        {data && !first && <p className="muted mt-3">No places yet.</p>}
+        {latest.data && !firstLatest && (
+          <p className="muted mt-3">No places yet.</p>
+        )}
 
-        {first && (
-          <div className="mt-6 grid gap-8 md:grid-cols-[3fr_2fr]">
-            <FeaturedPlace business={first} large />
-            <div className="flex flex-col gap-8">
-              {rest.map((business) => (
-                <FeaturedPlace key={business.id} business={business} />
-              ))}
+        {firstLatest && (
+          <>
+            <h2>New places</h2>
+            <div className="mt-6 grid gap-8 md:grid-cols-[3fr_2fr]">
+              <FeaturedPlace business={firstLatest} large />
+              <div className="flex flex-col gap-8">
+                {restLatest.map((business) => (
+                  <FeaturedPlace key={business.id} business={business} />
+                ))}
+              </div>
             </div>
-          </div>
+          </>
+        )}
+
+        {latest.isPending && <p className="muted mt-3">Loading…</p>}
+        {latest.isError && (
+          <p className="field-error mt-3" role="alert">
+            {latest.error.message}
+          </p>
+        )}
+        {latest.data && !firstLatest && (
+          <p className="muted mt-3">No places yet.</p>
+        )}
+
+        {firstPopular && (
+          <>
+            <h2 className="mt-10">Popular places</h2>
+            <div className="mt-6 grid gap-8 md:grid-cols-[3fr_2fr]">
+              <FeaturedPlace business={firstPopular} large />
+              <div className="flex flex-col gap-8">
+                {restPopular.map((business) => (
+                  <FeaturedPlace key={business.id} business={business} />
+                ))}
+              </div>
+            </div>
+          </>
         )}
 
         <Link to="/places" className="link mt-8 inline-block">

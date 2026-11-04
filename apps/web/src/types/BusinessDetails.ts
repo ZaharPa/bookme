@@ -40,6 +40,7 @@ export type BusinessDetails = {
   phone: string | null;
   type: BusinessType;
   status: BusinessStatus;
+  viewCount: number;
   description: string | null;
   cancellationWindowHours: number;
   locations: Location[];

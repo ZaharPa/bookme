@@ -36,13 +36,12 @@ export default function MyBusinessesPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1>My businesses</h1>
         <Link to="/businesses/create" className="btn">
-          Addbusiness
+          Add business
         </Link>
       </div>
 
       {data.items.length === 0 ? (
         <p className="mt-4 muted">
-          {" "}
           You have no businesses yet. Add one to start taking bookings
         </p>
       ) : (
@@ -61,7 +60,7 @@ export default function MyBusinessesPage() {
                     {humanize(business.type)}, {humanize(business.status)}
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="btn-secondary">
                   <Link to={`/businesses/${business.id}/update`}>Edit</Link>
                 </div>
                 <button
@@ -89,7 +88,7 @@ export default function MyBusinessesPage() {
                     <Link
                       to={`/businesses/${business.id}/locations/${location.id}/update`}
                       aria-label={`Edit location ${location.address}`}
-                      className="link"
+                      className="btn"
                     >
                       Edit location
                     </Link>

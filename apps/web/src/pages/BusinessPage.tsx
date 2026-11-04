@@ -38,7 +38,7 @@ export default function BusinessPage() {
       </p>
 
       {data.photos.length > 0 && (
-        <ul className="mt-8 grid grid-cols-2 gap-2 md:grid-cols-3">
+        <ul className="my-8 grid grid-cols-2 gap-2 md:grid-cols-3">
           {data.photos.map((photo, index) => (
             <li key={photo.id}>
               <img
@@ -98,7 +98,7 @@ export default function BusinessPage() {
               </div>
             )}
 
-            <div>
+            <div className="panel">
               <h3 className="label">Opening hours</h3>
               <dl>
                 {DAYS.map(([day, label]) => {

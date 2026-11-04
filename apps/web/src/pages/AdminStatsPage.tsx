@@ -1,12 +1,20 @@
 import { useState } from "react";
 import { useStats } from "../queries/admin";
 import { formatPrice } from "../utils/format";
+import StatCard from "../components/StatCard";
+
+const dayLabel = new Intl.DateTimeFormat("en-IE", {
+  day: "numeric",
+  month: "short",
+});
 
 export default function AdminStatsPage() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
 
   const { data, isFetching, isError, error } = useStats(from, to);
+
+  const label = (date: string) => dayLabel.format(new Date(`${date}T00:00`));
 
   return (
     <div>
@@ -17,7 +25,7 @@ export default function AdminStatsPage() {
 
       <div className="mt-6 flex flex-wrap gap-4">
         <label>
-          <span className="mb-1 block text-sm font-semibold">From</span>
+          <span className="label">From</span>
           <input
             type="date"
             value={from}
@@ -25,7 +33,7 @@ export default function AdminStatsPage() {
           />
         </label>
         <label>
-          <span className="mb-1 block text-sm font-semibold">To</span>
+          <span className="label">To</span>
           <input
             type="date"
             value={to}
@@ -49,32 +57,41 @@ export default function AdminStatsPage() {
       )}
 
       {data && (
-        <dl className="sheet mt-6 max-w-lg">
-          <div className="sheet-row flex items-baseline justify-between">
-            <dt>New users</dt>
-            <dd className="text-2xl font-semibold tabular-nums">
-              {data.newUsers}
-            </dd>
-          </div>
-          <div className="sheet-row flex items-baseline justify-between">
-            <dt>New businesses</dt>
-            <dd className="text-2xl font-semibold tabular-nums">
-              {data.newBusinesses}
-            </dd>
-          </div>
-          <div className="sheet-row flex items-baseline justify-between">
-            <dt>Bookings</dt>
-            <dd className="text-2xl font-semibold tabular-nums">
-              {data.bookings.count}
-            </dd>
-          </div>
-          <div className="sheet-row flex items-baseline justify-between">
-            <dt>Revenue</dt>
-            <dd className="text-2xl font-semibold tabular-nums">
-              {formatPrice(data.bookings.totalCents)}
-            </dd>
-          </div>
-        </dl>
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <StatCard
+            title="New users"
+            total={String(data.newUsers)}
+            points={data.daily.map((d) => ({
+              label: label(d.date),
+              value: d.newUsers,
+            }))}
+          />
+          <StatCard
+            title="New businesses"
+            total={String(data.newBusinesses)}
+            points={data.daily.map((d) => ({
+              label: label(d.date),
+              value: d.newBusinesses,
+            }))}
+          />
+          <StatCard
+            title="Bookings"
+            total={String(data.bookings.count)}
+            points={data.daily.map((d) => ({
+              label: label(d.date),
+              value: d.bookings,
+            }))}
+          />
+          <StatCard
+            title="Revenue"
+            total={formatPrice(data.bookings.totalCents)}
+            format={formatPrice}
+            points={data.daily.map((d) => ({
+              label: label(d.date),
+              value: d.revenueCents,
+            }))}
+          />
+        </div>
       )}
     </div>
   );

@@ -55,6 +55,7 @@ export async function viewAllBusinesses(req: Request, res: Response) {
     Math.max(1, Math.floor(Number(req.query.perPage)) || 10),
   );
   const type = BUSINESS_TYPES.find((t) => t === req.query.type);
+  const sort = req.query.sort === "popular" ? "popular" : "new";
 
   const filter = {
     status: "APPROVED" as const,
@@ -72,7 +73,9 @@ export async function viewAllBusinesses(req: Request, res: Response) {
           ),
       )
       .include("photos", (photo) => photo.where({ deletedAt: null }))
-      .orderBy((b) => b.createdAt.desc())
+      .orderBy((b) =>
+        sort === "popular" ? b.viewCount.desc() : b.createdAt.desc(),
+      )
       .limit(perPage)
       .offset((page - 1) * perPage)
       .all(),
